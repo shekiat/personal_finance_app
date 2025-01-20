@@ -45,6 +45,20 @@
                 </div>
             </section>
 
+            <!-- Transaction Form -->
+            <section class="transaction-form">
+                <h3>Enter Transaction</h3>
+                <form action="/submit" method="post">
+                    <label for="amount">Amount:</label>
+                    <input type="text" id="amount" name="amount" required>
+            
+                    <!-- <label for="time">Date:</label>
+                    <input type="text" id="date" name="date" placeholder="" required> -->
+            
+                    <button type="submit">Submit</button>
+                </form>
+            </section>
+            
             <!-- Transaction Table -->
             <section class="transactions">
                 <h3>Recent Transactions</h3>
@@ -56,6 +70,15 @@
                         <th>Status</th>
                         <th>Amount</th>
                     </tr>
+                    {% for transaction in trans_list %}
+                    <tr>
+                        <td>Jim Gorden</td>
+                        <td>12/02/2024</td>
+                        <td>6:00PM</td>
+                        <td class="complete">Complete</td>
+                        <td>${{transaction[1]}}</td>
+                    </tr>
+                    {% endfor %}
                     <tr>
                         <td>Jim Gorden</td>
                         <td>12/02/2024</td>
