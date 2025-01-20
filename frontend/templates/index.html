@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance App</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Personal Finance App</h1>
+            <h2>Dashboard</h2>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header>
+                <div class="user">
+                    <img src="assets/user-avatar.png" alt="User">
+                    <h3>Bruce Wayne</h3>
+                    <p>wayne@gmail.com</p>
+                </div>
+                
+            </header>
+
+            <!-- Dashboard Stats -->
+            <section class="stats">
+                <div class="stat-box">
+                    <h4>Total Balance</h4>
+                    <p>$164,802.43</p>
+                    <span class="increase">+ $17,938 (13%)</span>
+                    
+                </div>
+                <div class="stat-box">
+                    <h4>Total Income</h4>
+                    <p>$14,802.32</p>
+                    <span class="increase">+ $10,398 (13%)</span>
+                    
+                </div>
+                <div class="stat-box">
+                    <h4>Total Expense</h4>
+                    <p>$16,202.43</p>
+                    <span class="decrease">- $17,398 (16%)</span>
+                    
+                </div>
+            </section>
+
+            <!-- Transaction Table -->
+            <section class="transactions">
+                <h3>Recent Transactions</h3>
+                <table>
+                    <tr>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                    </tr>
+                    <tr>
+                        <td>Jim Gorden</td>
+                        <td>12/02/2024</td>
+                        <td>6:00PM</td>
+                        <td class="complete">Complete</td>
+                        <td>$340</td>
+                    </tr>
+                    <tr>
+                        <td>Jim Gorden</td>
+                        <td>12/02/2024</td>
+                        <td>6:00PM</td>
+                        <td class="pending">Pending</td>
+                        <td>$199</td>
+                    </tr>
+                    <tr>
+                        <td>Jim Gorden</td>
+                        <td>12/02/2024</td>
+                        <td>6:00PM</td>
+                        <td class="failed">Failed</td>
+                        <td>$240</td>
+                    </tr>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    
+</body>
+</html>
