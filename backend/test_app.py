@@ -1,6 +1,6 @@
 from flask import Flask
 import sqlite3
-import os
+import os 
 
 # object to create a flask application
 app = Flask(__name__, template_folder=os.path.abspath('../frontend/templates'), 
