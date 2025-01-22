@@ -70,10 +70,15 @@
                         <th>Status</th>
                         <th>Amount</th>
                     </tr>
+                    <!--For loop for pulling transactions from db-->
                     {% for transaction in trans_list %}
                     <tr>
                         <td>Jim Gorden</td>
-                        <td>12/02/2024</td>
+                        {% if transaction[3][5] == "1" %}
+                            <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                        {% else %}
+                            <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                        {% endif %}
                         <td>6:00PM</td>
                         <td class="complete">Complete</td>
                         <td>${{transaction[1]}}</td>

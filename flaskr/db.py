@@ -3,7 +3,7 @@ import sqlite3
 import datetime
 import click
 import os
-
+from dateutil.parser import parse
 
 def get_db():
     if 'db' not in g:
@@ -18,6 +18,18 @@ def close_db(e=None):
 
     if db is not None:
         db.close()
+
+def write_to_db(user="Jim Gorden", amount=None, date='12-25-2024', category='BILLS', memo='TEST'):
+    def parse_date(date):
+        try:
+            return parse(date)
+        except ValueError:
+            return None  # Return None if the input is not a valid date
+
+    db = get_db()
+    data = (db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS").fetchone()[0] + 1, amount, category, parse_date(date).date(), memo)
+    db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
+    db.commit()
 
 
 def init_db():
