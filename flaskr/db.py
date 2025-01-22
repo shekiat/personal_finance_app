@@ -19,15 +19,15 @@ def close_db(e=None):
     if db is not None:
         db.close()
 
-def write_to_db(user="Jim Gorden", amount=None, date='12-25-2024', category='BILLS', memo='TEST'):
-    def parse_date(date):
+def parse_date(date):
         try:
             return parse(date)
         except ValueError:
             return None  # Return None if the input is not a valid date
 
+def write_to_db(user="Jim Gorden", amount=None, date='12-25-2024', category='BILLS', memo=None):
     db = get_db()
-    data = (db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS").fetchone()[0] + 1, amount, category, parse_date(date).date(), memo)
+    data = (db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS").fetchone()[0] + 1, amount, category, parse_date(date), memo if memo else '')
     db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
     db.commit()
 
