@@ -6,4 +6,4 @@ cursor = conn.cursor() # set up cursor object for executing SQL statements
 
 res = cursor.execute("SELECT * FROM TRANSACTIONS")
 trans_list = res.fetchall()
-print(trans_list[0][1])
+print(trans_list)

@@ -48,6 +48,7 @@
             <!-- Transaction Form -->
             <section class="transaction-form">
                 <h3>Enter Transaction</h3>
+                {% if session_vars["submit_successful"] == True %}
                 <form action="/submit" method="post">
                     <label for="date">Date:</label>
                     <input type="text" id="date" name="date" required>
@@ -63,6 +64,23 @@
             
                     <button type="submit">Submit</button>
                 </form>
+                {% else %}
+                <form action="/submit" method="post">
+                    <label for="date">Date:</label>
+                    <input type="text" id="date" name="date" value="{{session_vars['session_date']}}" required>
+
+                    <label for="amount">Amount:</label>
+                    <input type="text" id="amount" name="amount" value="{{session_vars['session_amount']}}" required>
+                  
+                    <label for="category">Category:</label>
+                    <input type="text" id="category" name="category" value="{{session_vars['session_category']}}" required>
+
+                    <label for="memo">Memo:</label>
+                    <input type="text" id="memo" name="memo" value="{{session_vars['session_memo']}}">
+            
+                    <button type="submit">Submit</button>
+                </form>
+                {% endif %}
             </section>
             
             <!-- Transaction Table -->
@@ -81,12 +99,18 @@
                     {% for transaction in trans_list %}
                     <tr>
                         <td>Jim Gorden</td>
+                        <!--format date-->
                         {% if transaction[3][5] == "1" %}
                             <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
                         {% else %}
                             <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
                         {% endif %}
-                        <td>${{transaction[1]}}</td>
+                        <!--add zero to end of amount if it should end in one-->
+                        {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
+                            <td>${{transaction[1]}}0</td>
+                        {% else %}
+                            <td>${{transaction[1]}}</td>
+                        {% endif %}
                         <td>{{transaction[2].title()}}</td>
                         <td>{{transaction[4]}}</td>
                     </tr>

@@ -27,7 +27,7 @@ def parse_date(date):
 
 def write_to_db(user="Jim Gorden", amount=None, date='12-25-2024', category='BILLS', memo=None):
     db = get_db()
-    data = (db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS").fetchone()[0] + 1, amount, category, parse_date(date), memo if memo else '')
+    data = (db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS").fetchone()[0] + 1, amount, category, date, memo if memo else '')
     db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
     db.commit()
 
