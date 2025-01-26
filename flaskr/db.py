@@ -25,11 +25,44 @@ def parse_date(date):
         except ValueError:
             return None  # Return None if the input is not a valid date
 
-def write_to_db(user="Jim Gorden", amount=None, date='12-25-2024', category='BILLS', memo=None):
+def write_transaction(user="Jim Gorden", amount=None, date='12-25-2024', category='BILLS', memo=None):
     db = get_db()
     data = (db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS").fetchone()[0] + 1, amount, category, date, memo if memo else '')
     db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
     db.commit()
+
+def read_transactions():
+    db = get_db()
+    res = db.execute("SELECT * FROM TRANSACTIONS ORDER BY TRANS_DATE DESC") # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
+    trans_list = res.fetchall()
+
+    return trans_list
+
+# once a new month is picked, check if it exists in the TOTALS_PER_MONTH table
+def check_and_read_month_totals(month, year):
+    db = get_db()
+    res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (month, year))
+    res_totals = res.fetchall()
+
+    total_balance = 0
+    total_expenses = 0
+    total_income = 0
+
+    # if month is in db fetch totals, if month is not add a row with totals
+    if len(res_totals) == 0:
+        db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, 0, 0)", (month, year))
+        db.commit()
+    else:
+        total_balance, total_expenses, total_income = res_totals[0]
+
+    return total_balance, total_expenses, total_income
+        
+
+
+
+        
+    
+
 
 
 def init_db():
