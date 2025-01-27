@@ -27,19 +27,40 @@
             <section class="stats">
                 <div class="stat-box">
                     <h4>Total Balance</h4>
-                    <p>${{totals[0]}}</p>
+                    {% if (total_values[0] | string)[total_values[0] | string | length - 2 ] == "." %}
+                        <p>${{total_values[0]}}0</p>
+                    {% else %}
+                        <p>${{total_values[0]}}</p>
+                    {% endif %}
                     <span class="increase">+ $17,938 (13%)</span>
-                    
                 </div>
+                
                 <div class="stat-box">
                     <h4>Total Expense</h4>
-                    <p>${{totals[1]}}</p>
-                    <span class="decrease">- $17,398 (16%)</span>
+                    {% if (total_values[1] | string)[total_values[1] | string | length - 2 ] == "." %}
+                        <p>${{total_values[1]}}0</p>
+                    {% else %}
+                        <p>${{total_values[1]}}</p>
+                    {% endif %}
                     
+                    {% if total_diffs[1] != 0 %}
+                        {% if (total_diffs[1] | string)[total_diffs[1] | string | length - 2 ] == "." %}
+                            <p>{{total_diffs[1]}}0 ({{total_diff_percs[1]}}%)</p>
+                        {% else %}
+                            <p>{{total_diffs[1]}} ({{total_diff_percs[1]}}%)</p>
+                        {% endif %}
+                    {% else %}
+                        <p>-</p>
+                    {% endif %}
                 </div>
+
                 <div class="stat-box">
                     <h4>Total Income</h4>
-                    <p>${{totals[2]}}</p>
+                    {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
+                        <p>${{total_values[2]}}0</p>
+                    {% else %}
+                        <p>${{total_values[2]}}</p>
+                    {% endif %}
                     <span class="increase">+ $10,398 (13%)</span>
                     
                 </div>
@@ -115,28 +136,6 @@
                         <td>{{transaction[4]}}</td>
                     </tr>
                     {% endfor %}
-                    <tr>
-                        <td>Jim Gorden</td>
-                        <td>12/02/2024</td>
-                        <td>$340</td>
-                        <td>water</td>
-                        <td>Case of water</td>
-
-                    </tr>
-                    <tr>
-                        <td>Jim Gorden</td>
-                        <td>12/02/2024</td>
-                        <td>$199</td>
-                        <td>phone bill</td>
-                        <td>Paid on the 15th</td>
-                    </tr>
-                    <tr>
-                        <td>Jim Gorden</td>
-                        <td>12/02/2024</td>
-                        <td>$240</td>
-                        <td>utility bill</td>
-                        <td>Paid on the 1st</td>
-                    </tr>
                 </table>
             </section>
 
