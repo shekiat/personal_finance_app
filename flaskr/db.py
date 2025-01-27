@@ -41,7 +41,7 @@ def write_transaction(user, amount, date, category, memo):
 
 def read_transactions(month, year):
     db = get_db()
-    res = db.execute("SELECT * FROM TRANSACTIONS WHERE TRANS_MONTH = ? AND TRANS_YEAR = ? ORDER BY TRANS_DATE DESC", (12, 2024)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
+    res = db.execute("SELECT * FROM TRANSACTIONS WHERE TRANS_MONTH = ? AND TRANS_YEAR = ? ORDER BY TRANS_DATE DESC", (month, year)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
     trans_list = res.fetchall()
 
     return trans_list
@@ -50,20 +50,20 @@ def read_transactions(month, year):
 def check_and_read_month_totals(month, year):
     db = get_db()
     # get information from current month
-    res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (12, 2024))
+    res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (month, year))
     res_totals = res.fetchall()
 
     total_values = [0, 0, 0]
 
     # if month is in db fetch totals, if month is not add a row with totals
     if len(res_totals) == 0:
-        db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, 0, 0)", (12, 2024))
+        db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, 0, 0)", (month, year))
         db.commit()
     else:
         total_values = res_totals[0]
 
     # get information from past month
-    res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (month - 1 if month != 1 else 12, year if month != 1 else year - 1))
+    res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (int(month) - 1 if month != 1 else 12, year if month != 1 else int(year) - 1))
     res_totals = res.fetchall()
 
     total_differences = list(total_values)
@@ -94,6 +94,14 @@ def update_totals(month, year, amount):
         db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, ?, 0)", (month, year, amount))
 
     db.commit()
+
+def read_categories():
+    db = get_db()
+
+    res = db.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS ORDER BY TRANS_CATEGORY")
+    category_data = res.fetchall()
+
+    return category_data
 
 def init_db():
     db = get_db()
