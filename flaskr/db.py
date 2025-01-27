@@ -56,10 +56,7 @@ def check_and_read_month_totals(month, year):
     total_values = [0, 0, 0]
 
     # if month is in db fetch totals, if month is not add a row with totals
-    if len(res_totals) == 0:
-        db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, 0, 0)", (month, year))
-        db.commit()
-    else:
+    if len(res_totals) != 0:
         total_values = res_totals[0]
 
     # get information from past month
@@ -71,7 +68,7 @@ def check_and_read_month_totals(month, year):
     past_month_values = [0, 0, 0]
     
     # if month is in db fetch diffs
-    if len(res_totals) != 0:
+    if len(res_totals) != 0 and res_totals[0][2] is not None:
         past_month_values = res_totals[0]
         total_differences = [round(x - y, 2) for x, y in zip(total_differences, past_month_values)]
         for i in range(3):
@@ -99,9 +96,9 @@ def read_categories():
     db = get_db()
 
     res = db.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS ORDER BY TRANS_CATEGORY")
-    category_data = res.fetchall()
+    categories = [row['TRANS_CATEGORY'] for row in res.fetchall()]
 
-    return category_data
+    return categories
 
 def init_db():
     db = get_db()
