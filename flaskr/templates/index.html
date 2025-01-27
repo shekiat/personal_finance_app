@@ -23,6 +23,38 @@
                 
             </header>
 
+            <!-- Date Selection -->
+            <section class="date-selection">
+                <h3>Choose Date Range</h3>
+                <form action="/submit-date" method="post">
+                
+                    <!--pass in {{ session_vars['current_month'] }} and {{ session_vars['current_year'] }} for month and year chosen-->
+                    <label for="month">Month:</label>
+                    <select id="month" name="month">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                        
+                    </select>
+
+                    <label for="year">Year: </label>
+                    <select id="year" name="year"></select>
+
+                    <button type="submit">Submit</button>
+
+                </form>
+
+            </section>
+
             <!-- Dashboard Stats -->
             <section class="stats">
                 <div class="stat-box">
@@ -69,21 +101,45 @@
             <!-- Transaction Form -->
             <section class="transaction-form">
                 <h3>Enter Transaction</h3>
-                {% if session_vars["submit_successful"] == True %}
+                {% if session_vars["submit_successful"] != False %}
                 <form action="/submit" method="post">
                     <label for="date">Date:</label>
                     <input type="text" id="date" name="date" required>
 
                     <label for="amount">Amount:</label>
                     <input type="text" id="amount" name="amount" required>
-                  
-                    <label for="category">Category:</label>
-                    <input type="text" id="category" name="category" required>
 
                     <label for="memo">Memo:</label>
-                    <input type="text" id="memo" name="category">
-            
+                    <input type="text" id="memo" name="memo">
+
+                    <label for="category">Category:</label>
+                    <select id="category" name="category">
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Health">Health</option>
+                        <option value="Education">Education</option>
+                    </select>
+
+                    <button type="button" onclick="showInputField()">Add Category</button>
+                    <!-- --------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
+                    <div id="subCategoryBtn">
+                       
+                        <input type="text" id="add-category" class="add-category" placeholder="Type in your category">
+                    </div>
+                    <!-- -------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
+                    
                     <button type="submit">Submit</button>
+
+                    {% if session_vars["submit_successful"] == True %}
+                        <!-- add styling-->
+                        <div id="successMessage">
+                            <p>Form submitted successfully!</p>
+                        </div>
+                    {% endif %}
                 </form>
                 {% else %}
                 <form action="/submit" method="post">
@@ -92,14 +148,36 @@
 
                     <label for="amount">Amount:</label>
                     <input type="text" id="amount" name="amount" value="{{session_vars['session_amount']}}" required>
-                  
-                    <label for="category">Category:</label>
-                    <input type="text" id="category" name="category" value="{{session_vars['session_category']}}" required>
 
                     <label for="memo">Memo:</label>
                     <input type="text" id="memo" name="memo" value="{{session_vars['session_memo']}}">
-            
-                    <button type="submit">Submit</button>
+
+                    <label for="category">Category:</label>
+                    <select id="category" name="category">
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Health">Health</option>
+                        <option value="Education">Education</option>
+                    </select>
+
+                    <button type="button" onclick="showInputField()">Add Category</button>
+                    <!-- --------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
+                    <div id="subCategoryBtn">
+                       
+                        <input type="text" id="add-category" class="add-category" placeholder="Type in your category">
+                    </div>
+                    <!-- -------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
+
+                    <button id="transaction-table" type="submit">Submit</button>
+                    
+                    <!-- add styling-->
+                    <div id="failMessage">
+                        <p>Date is in the past!</p>
+                    </div>
                 </form>
                 {% endif %}
             </section>
@@ -142,6 +220,7 @@
         </main>
     </div>
 
+    <script src="../static/js/index.js"></script>
     
 </body>
 </html>
