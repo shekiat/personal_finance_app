@@ -46,6 +46,11 @@ def read_transactions(month, year):
 
     return trans_list
 
+def delete_transaction(trans_id):
+    db = get_db()
+    db.execute("DELETE FROM TRANSACTIONS WHERE TRANS_ID = ?", (trans_id))
+    db.commit()
+
 # once a new month is picked, check if it exists in the TOTALS_PER_MONTH table
 def check_and_read_month_totals(month, year):
     db = get_db()

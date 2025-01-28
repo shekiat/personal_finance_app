@@ -95,3 +95,14 @@ def month_change():
     session['chosen_year'] = year
 
     return redirect(url_for("run_website.index"))
+
+
+@bp.route('/delete-transaction', methods=['POST'])
+def delete():
+    transaction_id = request.form['transaction_id']
+
+    delete_transaction(transaction_id)
+
+    # Feedback that transaction has been deleted?
+
+    return redirect(url_for("run_website.index"))
