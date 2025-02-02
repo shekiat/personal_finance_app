@@ -22,43 +22,69 @@
                 </div>
                 
             </header>
+            <h3>{{ chosen_month_string }} {{session_vars['chosen_year']}}</h3>
+            <body>
+                <button id="toggleBtn">Change Month/Year</button>
+                <div id="content">
+                    <section class="date-selection">
+                        <h3>Choose Date Range</h3>
+                        <form action="/submit-date" method="post">
+                            <script>
+                                var chosen_year = {{ session_vars['chosen_year'] }}
+                            </script>
+
+                        
+                            <!--pass in {{ session_vars['chosen_month'] }} and {{ session_vars['chosen_year'] }} for month and year chosen-->
+                            <label for="month">Month:</label>
+                            <select id="month" name="month">
+                                <option value="January" {% if session_vars["chosen_month"] == 1 %}selected{% endif %}>January</option>
+                                <option value="February" {% if session_vars["chosen_month"] == 2 %}selected{% endif %}>February</option>
+                                <option value="March" {% if session_vars["chosen_month"] == 3 %}selected{% endif %}>March</option>
+                                <option value="April" {% if session_vars["chosen_month"] == 4 %}selected{% endif %}>April</option>
+                                <option value="May" {% if session_vars["chosen_month"] == 5 %}selected{% endif %}>May</option>
+                                <option value="June" {% if session_vars["chosen_month"] == 6 %}selected{% endif %}>June</option>
+                                <option value="July" {% if session_vars["chosen_month"] == 7 %}selected{% endif %}>July</option>
+                                <option value="August" {% if session_vars["chosen_month"] == 8 %}selected{% endif %}>August</option>
+                                <option value="September" {% if session_vars["chosen_month"] == 9 %}selected{% endif %}>September</option>
+                                <option value="October" {% if session_vars["chosen_month"] == 10 %}selected{% endif %}>October</option>
+                                <option value="November" {% if session_vars["chosen_month"] == 11 %}selected{% endif %}>November</option>
+                                <option value="December" {% if session_vars["chosen_month"] == 12 %}selected{% endif %}>December</option>
+                            </select>
+        
+                            <label for="year">Year: </label>
+                            <select id="year" name="year"></select>
+                            <button type="submit">Submit</button>
+        
+        
+                        </form>
+        
+                    </section>
+                </div>
+
+                <script>
+                    const btn = document.getElementById("toggleBtn");
+                    const content = document.getElementById("content");
+                    content.style.display = "none";
+                    btn.textContent = "Change Month/Year";
+
+                    btn.addEventListener("click", function() {
+                        if (content.style.display === "none" || content.style.display === "") {
+                            content.style.display = "block";
+                            btn.textContent = "Hide";
+                        } else {
+                            content.style.display = "none";
+                            btn.textContent = "Change Month/Year";
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+
 
 
             
             <!-- Date Selection -->
-            <section class="date-selection">
-                <h3>Choose Date Range</h3>
-                <form action="/submit-date" method="post">
-                
-                    <!--pass in {{ session_vars['current_month'] }} and {{ session_vars['current_year'] }} for month and year chosen-->
-                    <label for="month">Month:</label>
-                    <select id="month" name="month">
-                        <option value="January" {% if session.get('chosen_month') == 'January' %}selected{% endif %}>January</option>
-                        <option value="February" {% if session.get('chosen_month') == 'February' %}selected{% endif %}>February</option>
-                        <option value="March" {% if session.get('chosen_month') == 'March' %}selected{% endif %}>March</option>
-                        <option value="April" {% if session.get('chosen_month') == 'April' %}selected{% endif %}>April</option>
-                        <option value="May" {% if session.get('chosen_month') == 'May' %}selected{% endif %}>May</option>
-                        <option value="June" {% if session.get('chosen_month') == 'June' %}selected{% endif %}>June</option>
-                        <option value="July" {% if session.get('chosen_month') == 'July' %}selected{% endif %}>July</option>
-                        <option value="August" {% if session.get('chosen_month') == 'August' %}selected{% endif %}>August</option>
-                        <option value="September" {% if session.get('chosen_month') == 'September' %}selected{% endif %}>September</option>
-                        <option value="October" {% if session.get('chosen_month') == 'October' %}selected{% endif %}>October</option>
-                        <option value="November" {% if session.get('chosen_month') == 'November' %}selected{% endif %}>November</option>
-                        <option value="December" {% if session.get('chosen_month') == 'December' %}selected{% endif %}>December</option>
-      
-                    </select>
-
-                    <label for="year">Year: </label>
-                    <select id="year" name="year">
-                        {% for year in range(current_year - 10, current_year + 1) %}
-                            <option value="{{ year }}" {% if session.get('chosen_year') == year %}selected{% endif %}>{{ year }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit">Submit</button>
-
-                </form>
-
-            </section>
+            
 
 
 
@@ -163,10 +189,11 @@
                         {% endfor %}
                     </select>
 
+                    
+
                     <button type="button" onclick="showInputField()">Add Category</button>
                     <!-- --------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
                     <div id="subCategoryBtn">
-                       
                         <input type="text" id="add-category" class="add-category" placeholder="Type in your category">
                     </div>
                     <!-- -------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->

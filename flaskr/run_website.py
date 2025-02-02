@@ -10,6 +10,21 @@ from werkzeug.exceptions import abort
 
 bp = Blueprint('run_website', __name__)
 
+int_to_month = {
+    1 : "January",
+    2 : "February",
+    3 : "March",
+    4 : "April",
+    5 : "May",
+    6 : "June",
+    7 : "July",
+    8 : "August",
+    9 : "September",
+    10 : "October",
+    11 : "November",
+    12 : "December"
+}
+
 @bp.route('/')
 def index():
     # once information appearing in totals is implemented, may have to change session vars logic
@@ -24,19 +39,19 @@ def index():
         "session_memo": session.get("memo", ''),
 
         # for totals
-        "current_month": session.get("chosen_month", datetime.datetime.now().month),
-        "current_year": session.get("chosen_year", datetime.datetime.now().year)
+        "chosen_month": session.get("chosen_month", datetime.datetime.now().month),
+        "chosen_year": session.get("chosen_year", datetime.datetime.now().year)
     }
     session.clear()
 
     # get the totals and transactions for current month
     trans_list = []
 
-    current_month = session_vars['current_month']
-    current_year = session_vars['current_year']
+    chosen_month = session_vars['chosen_month']
+    chosen_year = session_vars['chosen_year']
 
-    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(current_month, current_year) # [balance, expenses, income]
-    trans_list = read_transactions(current_month, current_year)
+    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year) # [balance, expenses, income]
+    trans_list = read_transactions(chosen_month, chosen_year)
     
     # format differences for presentation
     for i in range(3):
@@ -47,8 +62,17 @@ def index():
 
     # get categories for drop down
     category_list = read_categories()
+
+    # year list for drop down
+    year_list = []
+    for year in range (datetime.datetime.now().year - 10, datetime.datetime.now().year - 2):
+        year_list.append(year)
+
+    # month converted to string
+    if isinstance(session_vars["chosen_month"], int):
+        chosen_month_string = int_to_month[session_vars["chosen_month"]]
         
-    return render_template("index.html", trans_list=trans_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list)
+    return render_template("index.html", trans_list=trans_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now().year, chosen_month_string=chosen_month_string)
     
     
 @bp.route('/submit', methods=['POST'])
@@ -91,8 +115,8 @@ def month_change():
 
     month_number = datetime.datetime.strptime(month, "%B").month
 
-    session['chosen_month'] = month_number
-    session['chosen_year'] = year
+    session['chosen_month'] = int(month_number)
+    session['chosen_year'] = int(year)
 
     return redirect(url_for("run_website.index"))
 
