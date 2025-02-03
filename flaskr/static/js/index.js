@@ -21,9 +21,22 @@ for (let year = startYear; year <= endYear; year++) {
 
 
 // Displays the subcategory input field when the "Add Subcategory" button is clicked
-function showInputField() {
-    document.getElementById("subCategoryBtn").style.display = "block"; // Show the input box
-}
+document.getElementById("toggleCategoryBtn").addEventListener("click", function() {
+    const dropdown = document.getElementById("categoryDropdown");
+    const input = document.getElementById("categoryInput");
+    const button = document.getElementById("toggleCategoryBtn");
+
+    if (dropdown.style.display === "none") {
+        dropdown.style.display = "block";
+        input.style.display = "none";
+        button.textContent = "Add Category";
+    } else {
+        dropdown.style.display = "none";
+        input.style.display = "block";
+        button.textContent = "Choose Existing Category";
+    }
+});
+
 
 // Displays the success/fail message when the form is submitted
 function showSuccessMessage() {
