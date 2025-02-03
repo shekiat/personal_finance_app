@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -147,20 +148,24 @@
                     <label for="memo">Memo:</label>
                     <input type="text" id="memo" name="memo">
 
-                    <label for="category">Category:</label>
-                    <select id="category" name="category">
-                        {% for category in category_list %}
-                            <option value="{{category_list.index(category)}}">{{ category }}</option>
-                        {% endfor %}
-                    </select>
 
-                    <button type="button" onclick="showInputField()">Add Category</button>
-                    <!-- --------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
-                    <div id="subCategoryBtn">
-                       
-                        <input type="text" id="add-category" class="add-category" placeholder="Type in your category">
+                    
+                    <div id="categoryDropdown">
+                        <label for="category">Category:</label>
+                        <select id="category" name="category">
+                            {% for category in category_list %}
+                                <option value="{{category_list.index(category)}}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <!-- -------------------------INCOMPLETE SUB CATEGORY BUTTON CONFIGURATION---------------- -->
+                    
+                    <div id="categoryInput" style="display: none;">
+                        <label for="add-category">New Category:</label>
+                        <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
+                    </div>
+                    
+                    <button type="button" id="toggleCategoryBtn">Add Category</button>
+                    
                     
                     <button type="submit">Submit</button>
 
