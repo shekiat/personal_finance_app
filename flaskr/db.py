@@ -41,7 +41,7 @@ def write_transaction(user, amount, date, category, memo):
 
 def read_transactions(month, year):
     db = get_db()
-    res = db.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = ? AND MONTH = ? ORDER BY TRANS_DATE DESC", (month, year)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
+    res = db.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = ? AND YEAR = ? ORDER BY TRANS_DATE DESC", (month, year)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
     trans_list = res.fetchall()
 
     return trans_list
