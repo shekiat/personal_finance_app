@@ -35,13 +35,13 @@ def write_transaction(user, amount, date, category, memo):
     else:
         new_id = 0
 
-    data = (new_id, amount, category, date, memo if memo else '')
+    data = (new_id, amount if amount[0] != '$' else amount[1:], category, date, memo if memo else '')
     db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
     db.commit()
 
 def read_transactions(month, year):
     db = get_db()
-    res = db.execute("SELECT * FROM TRANSACTIONS WHERE TRANS_MONTH = ? AND TRANS_YEAR = ? ORDER BY TRANS_DATE DESC", (month, year)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
+    res = db.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = ? AND YEAR = ? ORDER BY TRANS_DATE DESC", (month, year)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
     trans_list = res.fetchall()
 
     return trans_list
@@ -84,16 +84,19 @@ def check_and_read_month_totals(month, year):
 
     return total_values, total_differences, total_differences_percs
 
-def update_totals(month, year, amount):
+def update_totals(month=None, year=None):
     db = get_db()
 
-    res = db.execute("SELECT * FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (month, year))
-    if len(res.fetchall()) != 0: 
-        # if month exists in table, update
-        db.execute("UPDATE TOTALS_PER_MONTH SET TOTAL_EXPENSES = TOTAL_EXPENSES + ? WHERE MONTH = ? AND YEAR = ?", (amount, month, year))
-    else:
-        # if month does not exist in table, add it
-        db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, ?, 0)", (month, year, amount))
+    if [month, year] != [None, None]: # = [None, None] if we are not adding a transaction
+        res = db.execute("SELECT * FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (month, year))
+        if len(res.fetchall()) == 0: 
+            db.execute("INSERT INTO TOTALS_PER_MONTH VALUES(?, ?, 0, 0, 0)", (month, year))
+
+    db.execute("UPDATE TOTALS_PER_MONTH SET TOTAL_EXPENSES = month_sum_table.MONTH_SUMS FROM (SELECT  SUM(TRANS_AMOUNT) AS MONTH_SUMS, MONTH, YEAR FROM TRANSACTIONS  GROUP BY MONTH, YEAR) AS month_sum_table WHERE TOTALS_PER_MONTH.MONTH =  month_sum_table.MONTH AND  TOTALS_PER_MONTH.YEAR=  month_sum_table.YEAR")
+        # UPDATE TOTALS_PER_MONTH
+        # SET TOTAL_EXPENSES = month_sum_table.MONTH_SUMS
+        # FROM (SELECT  SUM(TRANS_AMOUNT) AS MONTH_SUMS, MONTH, YEAR FROM TRANSACTIONS  GROUP BY MONTH, YEAR) AS month_sum_table
+        # WHERE TOTALS_PER_MONTH.MONTH =  month_sum_table.MONTH AND  TOTALS_PER_MONTH.YEAR=  month_sum_table.YEAR 
 
     db.commit()
 

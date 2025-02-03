@@ -93,8 +93,8 @@ def submit():
 
 
     if str(datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')) <= datetime.datetime.now(timezone.utc).strftime('%Y-%m-%d'):
-        write_transaction(user="Jim Gorden", amount=amount, category=category, date=parsed_date, memo=memo)
-        update_totals(parsed_date_full.month, parsed_date_full.year, amount)
+        write_transaction(user="Jim Gorden", amount=amount if amount[0] != '$' else amount[1:], category=category, date=parsed_date, memo=memo)
+        update_totals(parsed_date_full.month, parsed_date_full.year)
         session['submit_successful'] = True
     else:
         # if the date is in the future, notify user, add info to session so it stays in the input boxes
@@ -126,6 +126,7 @@ def delete():
     transaction_id = request.form['transaction_id']
 
     delete_transaction(transaction_id)
+    update_totals()
 
     # Feedback that transaction has been deleted?
 
