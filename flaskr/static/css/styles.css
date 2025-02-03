@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
+
+
 body {
     background-color: #121212;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
+    font-size: 16px;
     margin: 0;
     padding: 0;
 }
@@ -30,6 +34,36 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
+}
+
+button {
+    color: white;
+    background-color: #19bc00;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: none;
+    width: 100px;
+    font-weight: 600;
+   
+}
+
+button:hover {
+    color: white;
+    background-color: #128300;
+   
+}
+
+.date-selection{
+    padding: 0 50px;
+    margin-bottom: 40px;
+}
+
+.date-selection #month, .date-selection #year {
+    width: 100px;
+    height: 30px;
+    margin: 0 10px;
+
 }
 
 .stats {
@@ -50,6 +84,32 @@ header {
     border-collapse: collapse;
 }
 
+.transaction-form input{
+    margin: 0 10px;
+}
+
+.transaction-form button {
+    margin: 0 15px;
+}
+
+.transaction-form #category{
+    width: 100px;
+    height: 20px;
+}
+
+.transaction-form #category button{
+    margin: 20px 10px;
+}
+
+.transaction-form #subCategoryBtn {
+    width: 130px;
+    display:none;
+
+}
+.transaction-form #successMessage {
+    display:none;
+    color: green;
+}
 .transactions th, .transactions td {
     padding: 10px;
     border-bottom: 1px solid #333;
