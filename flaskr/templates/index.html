@@ -149,13 +149,17 @@
                         <label for="memo">Memo:</label>
                         <input type="text" id="memo" name="memo">
 
+                        <!-- stay on same month and year -->
+                        <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                        <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
 
-                        
+
+                        <!-- category input setup -->
                         <div id="categoryDropdown">
-                            <label for="category">Category:</label>
-                            <select id="category" name="category">
+                            <label for="category-list">Category:</label>
+                            <select id="category-list" name="category-list">
                                 {% for category in category_list %}
-                                    <option value="{{category_list.index(category)}}">{{ category }}</option>
+                                    <option> {{ category }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -164,17 +168,22 @@
                             <label for="add-category">New Category:</label>
                             <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
                         </div>
-                        
+
+                        <!-- holds the category value -->
+                        <input type="hidden" id="hidden-category" name="hidden-category">
+
                         <button type="button" id="toggleCategoryBtn">Add Category</button>
                     </div>
                     
-                    <button type="submit">Submit</button>
+                    <button type="submit" id="submit">Submit</button>
+
+                    <!-- add styling-->
+                    <div id="successMessage">
+                        <p>Transaction added!</p>
+                    </div>
 
                     {% if session_vars["submit_successful"] == True %}
-                        <!-- add styling-->
-                        <div id="successMessage">
-                            <p>Form submitted successfully!</p>
-                        </div>
+                        <body onload="showSuccessMessage()"></body>
                     {% endif %}
                 </form>
                 {% else %}
@@ -188,13 +197,17 @@
                     <label for="memo">Memo:</label>
                     <input type="text" id="memo" name="memo" value="{{session_vars['session_memo']}}">
 
+                    <!-- stay on same month and year -->
+                    <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                    <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
+
                     
 
-                    <div id="categoryDropdown">
-                        <label for="category">Category:</label>
-                        <select id="category" name="category">
+                    <!-- <div id="categoryDropdown">
+                        <label for="category-list">Category:</label>
+                        <select id="category-list" name="category-list">
                             {% for category in category_list %}
-                                <option value="{{category_list.index(category)}}">{{ category }}</option>
+                                <option>{{ category }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -204,7 +217,7 @@
                         <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
                     </div>
                     
-                    <button type="button" id="toggleCategoryBtn">Add Category</button>
+                    <button type="button" id="toggleCategoryBtn">Add Category</button> -->
                     
                     
                     
@@ -212,7 +225,7 @@
                     
                     <!-- add styling-->
                     <div id="failMessage">
-                        <p>Date is in the past!</p>
+                        <p>Date is in the future!</p>
                     </div>
                 </form>
                 {% endif %}
@@ -256,6 +269,8 @@
                         <td>
                             <form action="/delete-transaction" method="post">
                                 <input type="hidden" name="transaction_id" value="{{ transaction[0] }}">
+                                <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                                <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
                                 <button type="submit">Delete</button>
                             </form>
                         </td>

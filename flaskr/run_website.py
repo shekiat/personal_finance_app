@@ -7,6 +7,8 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, session
 )
 from werkzeug.exceptions import abort
+import pytz
+EST = pytz.timezone("US/Eastern")
 
 bp = Blueprint('run_website', __name__)
 
@@ -39,8 +41,8 @@ def index():
         "session_memo": session.get("memo", ''),
 
         # for totals
-        "chosen_month": session.get("chosen_month", datetime.datetime.now().month),
-        "chosen_year": session.get("chosen_year", datetime.datetime.now().year)
+        "chosen_month": session.get("chosen_month", datetime.datetime.now(tz=EST).month),
+        "chosen_year": session.get("chosen_year", datetime.datetime.now(tz=EST).year)
     }
     session.clear()
 
@@ -65,35 +67,36 @@ def index():
 
     # year list for drop down
     year_list = []
-    for year in range (datetime.datetime.now().year - 10, datetime.datetime.now().year - 2):
+    for year in range (datetime.datetime.now(tz=EST).year - 10, datetime.datetime.now(tz=EST).year - 2):
         year_list.append(year)
 
     # month converted to string
     if isinstance(session_vars["chosen_month"], int):
         chosen_month_string = int_to_month[session_vars["chosen_month"]]
         
-    return render_template("index.html", trans_list=trans_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now().year, chosen_month_string=chosen_month_string)
+    return render_template("index.html", trans_list=trans_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
     
     
 @bp.route('/submit', methods=['POST'])
 def submit():
     amount = request.form['amount']
-    category = request.form['category']
+    category = request.form['hidden-category']
     date = request.form['date']
     if request.form.get('memo'):
         memo = request.form['memo']
     else:
         memo = None 
 
-    # write_to_db(amount=amount, category=category, date=date, memo=memo)
-    # return f"Submitted amount={amount}, category={category}, date={date}"
+    session['chosen_month'] = int(request.form['month'])
+    session['chosen_year'] = int(request.form['year'])
 
     parsed_date_full = parse_date(date) # format date for comparison, to add to db
     parsed_date = parsed_date_full.date()
 
+    current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
 
-    if str(datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')) <= datetime.datetime.now(timezone.utc).strftime('%Y-%m-%d'):
-        write_transaction(user="Jim Gorden", amount=amount if amount[0] != '$' else amount[1:], category=category, date=parsed_date, memo=memo)
+    if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
+        write_transaction(user="Jim Gorden", amount=amount, category=category, date=parsed_date, memo=memo)
         update_totals(parsed_date_full.month, parsed_date_full.year)
         session['submit_successful'] = True
     else:
@@ -124,6 +127,8 @@ def month_change():
 @bp.route('/delete-transaction', methods=['POST'])
 def delete():
     transaction_id = request.form['transaction_id']
+    session['chosen_month'] = int(request.form['month'])
+    session['chosen_year'] = int(request.form['year'])
 
     delete_transaction(transaction_id)
     update_totals()
