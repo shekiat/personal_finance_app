@@ -96,7 +96,7 @@ def submit():
     current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
 
     if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-        write_transaction(user="Jim Gorden", amount=amount, category=category, date=parsed_date, memo=memo)
+        write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo)
         update_totals(parsed_date_full.month, parsed_date_full.year)
         session['submit_successful'] = True
     else:
