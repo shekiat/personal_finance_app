@@ -40,7 +40,7 @@ def write_transaction(user, amount, date, category, memo):
     if str(amount)[0] == '$':
         amount = int(str(amount)[1:])
 
-    data = (new_id, amount, category, date, memo if memo else '')
+    data = (new_id, amount, category.title(), date, memo if memo else '')
     db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
     db.commit()
 
@@ -53,7 +53,7 @@ def read_transactions(month, year):
 
 def delete_transaction(trans_id):
     db = get_db()
-    db.execute("DELETE FROM TRANSACTIONS WHERE TRANS_ID = ?", (trans_id))
+    db.execute("DELETE FROM TRANSACTIONS WHERE TRANS_ID = ?", (trans_id,))
     db.commit()
 
 # once a new month is picked, check if it exists in the TOTALS_PER_MONTH table
