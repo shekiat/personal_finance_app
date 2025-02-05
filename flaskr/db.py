@@ -35,7 +35,12 @@ def write_transaction(user, amount, date, category, memo):
     else:
         new_id = 0
 
-    data = (new_id, amount if amount[0] != '$' else amount[1:], category, date, memo if memo else '')
+    amount = amount 
+    
+    if str(amount)[0] == '$':
+        amount = int(str(amount)[1:])
+
+    data = (new_id, amount, category, date, memo if memo else '')
     db.execute(f"INSERT INTO TRANSACTIONS VALUES(?, ?, ?, ?, ?)", data)
     db.commit()
 
