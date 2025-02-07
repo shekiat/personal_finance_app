@@ -32,6 +32,7 @@
                         <form action="/submit-date" method="post">
                             <script>
                                 var chosen_year = {{ session_vars['chosen_year'] }}
+                                var expense_income = {{ session_vars['expense_income']}}
                             </script>
 
                         
@@ -118,27 +119,31 @@
                     {% else %}
                         <p>-</p>
                     {% endif %}
+                    <button type="button" id="addExpenseButton">Add/View Expenses</button>
                 </div>
 
                 <div class="stat-box">
                     <h4>Total Income</h4>
-                    {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
-                        <p>${{total_values[2]}}0</p>
-                    {% else %}
-                        <p>${{total_values[2]}}</p>
-                    {% endif %}
+                    <div class="incomeContainer">
+                        {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
+                            <p>${{total_values[2]}}0</p>
+                        {% else %}
+                            <p>${{total_values[2]}}</p>
+                        {% endif %}
+                    </div>
                     <span class="increase">+ $10,398 (13%)</span>
-                    
+                    <div><button type="button" id="addIncomeButton">Add/View Income</button></div>
                 </div>
+                
             </section>
 
 
 
             <!-- Transaction Form -->
-            <section class="transaction-form">
+            <section class="transaction-form" id="transactionForm">
                 <h3>Enter Transaction</h3>
                 {% if session_vars["submit_successful"] != False %}
-                <form action="/submit" method="post">
+                <form action="/submit-transaction" method="post">
                     <div>
                         <label for="date">Date:</label>
                         <input type="text" id="date" name="date" required>
@@ -169,8 +174,7 @@
                             <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
                         </div>
 
-                        <!-- holds the category value -->
-                        <input type="hidden" id="hidden-category" name="hidden-category">
+                        <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                         <button type="button" id="toggleCategoryBtn">Add Category</button>
                     </div>
@@ -187,7 +191,7 @@
                     {% endif %}
                 </form>
                 {% else %}
-                <form action="/submit" method="post">
+                <form action="/submit-transaction" method="post">
                     <label for="date">Date:</label>
                     <input type="text" id="date" name="date" value="{{session_vars['session_date']}}" required>
 
@@ -203,11 +207,12 @@
 
                     
 
-                    <!-- <div id="categoryDropdown">
+                    <!-- category input setup -->
+                    <div id="categoryDropdown">
                         <label for="category-list">Category:</label>
                         <select id="category-list" name="category-list">
                             {% for category in category_list %}
-                                <option>{{ category }}</option>
+                                <option> {{ category }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -216,9 +221,10 @@
                         <label for="add-category">New Category:</label>
                         <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
                     </div>
-                    
-                    <button type="button" id="toggleCategoryBtn">Add Category</button> -->
-                    
+
+                    <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
+
+                    <button type="button" id="toggleCategoryBtn">Add Category</button>
                     
                     
                     <button type="submit">Submit</button>
@@ -228,14 +234,73 @@
                         <p>Date is in the future!</p>
                     </div>
                 </form>
+                {% endif %}   
+            </section>
+                
+
+            <!-- Income Form -->
+            <section class="incomeForm" id="incomeForm">
+                <h3>Enter Income</h3>
+                {% if session_vars["submit_successful"] != False %}
+                    <form action="/submit-income" method="post">
+                        <div>
+                            <label for="date">Date:</label>
+                            <input type="text" id="date" name="date" required>
+
+                            <label for="amount">Amount:</label>
+                            <input type="text" id="amount" name="amount" required>
+
+                            <label for="memo">Memo:</label>
+                            <input type="text" id="memo" name="memo">
+
+                            <!-- stay on same month and year -->
+                            <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                            <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
+                        </div>
+                        
+                        <button type="submit" id="submit">Submit</button>
+
+                        <!-- add styling-->
+                        <div id="incomeSuccessMessage">
+                            <p>Income added!</p>
+                        </div>
+
+                        {% if session_vars["submit_successful"] == True %}
+                            <body onload="showIncomeSuccessMessage()"></body>
+                        {% endif %}
+                    </form>
+                {% else %}
+                    <form action="/submit-transaction" method="post">
+                        <label for="date">Date:</label>
+                        <input type="text" id="date" name="date" value="{{session_vars['session_date']}}" required>
+
+                        <label for="amount">Amount:</label>
+                        <input type="text" id="amount" name="amount" value="{{session_vars['session_amount']}}" required>
+
+                        <label for="memo">Memo:</label>
+                        <input type="text" id="memo" name="memo" value="{{session_vars['session_memo']}}">
+
+                        <!-- stay on same month and year -->
+                        <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                        <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
+                        
+                        
+                        <button type="submit">Submit</button>
+                        
+                        <!-- add styling-->
+                        <div id="failIncomeMessage">
+                            <p>Date is in the future!</p>
+                        </div>
+                    </form>
                 {% endif %}
             </section>
+
             
 
 
             <!-- Transaction Table -->
-            <section class="transactions">
-                <h3>Recent Transactions</h3>
+            <section class="transactions" id="transactionTable">
+                <h3>Transactions</h3>
                 <table>
                     <tr>
                         <th>User</th>
@@ -279,6 +344,52 @@
                     {% endfor %}
                 </table>
             </section>
+
+
+            <!-- Income Table -->
+            <section class="income" id="incomeTable">
+                <h3>Income</h3>
+                <table>
+                    <tr>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Memo</th>
+                        <th></th>
+                    </tr>
+                    <!--For loop for pulling income from db-->
+                    {% for income in income_list %}
+                    <tr>
+                        <td>Jim Gorden</td>
+                        <!--format date-->
+                        {% if income[2][5] == "1" %}
+                            <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                        {% else %}
+                            <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                        {% endif %}
+                        <!--add zero to end of amount if it should end in one-->
+                        {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
+                            <td>${{income[1]}}0</td>
+                        {% else %}
+                            <td>${{income[1]}}</td>
+                        {% endif %}
+                        <td>{{income[3]}}</td>
+
+                        <!--delete income-->
+                        <td>
+                            <form action="/delete-income" method="post">
+                                <input type="hidden" name="income_id" value="{{ income[0] }}">
+                                <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                                <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </table>
+            </section>
+
 
         </main>
     </div>
