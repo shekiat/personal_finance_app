@@ -72,6 +72,52 @@ document.getElementById("toggleCategoryBtn").addEventListener("click", function(
 });
 
 
+// Swaps visibility of Add Expense and Add Income buttons/elements
+const addExpense = document.getElementById("addExpenseButton");
+const addIncome = document.getElementById("addIncomeButton");
+
+const transactionForm = document.getElementById("transactionForm");
+const incomeForm = document.getElementById("incomeForm");
+
+const transactionTable = document.getElementById("transactionTable");
+const incomeTable = document.getElementById("incomeTable");
+
+if (expense_income == 0) {
+    addExpense.style.display = "none";
+    incomeForm.style.display = "none";
+    incomeTable.style.display = "none";
+} else {
+    addIncome.style.display = "none";
+    transactionForm.style.display = "none";
+    transactionTable.style.display = "none";
+}
+
+addIncome.addEventListener("click", function() {
+    expense_income = 1;
+
+    transactionForm.style.display = "none";
+    incomeForm.style.display = "block";
+
+    addExpense.style.display = "block"
+    addIncome.style.display = "none"
+
+    transactionTable.style.display = "none";
+    incomeTable.style.display = "block";
+});
+
+addExpense.addEventListener("click", function() {
+    expense_income = 0;
+
+    transactionForm.style.display = "block";
+    incomeForm.style.display = "none";
+
+    addExpense.style.display = "none";
+    addIncome.style.display = "block";
+
+    transactionTable.style.display = "block";
+    incomeTable.style.display = "none";
+});
+
 
 
 // Displays the success/fail message when the form is submitted
@@ -83,5 +129,17 @@ function showSuccessMessage() {
 function showFailMessage() {
     document.getElementById("failMessage").style.display = "block"; // Show the success message
 }
+
+
+// Displays the success/fail message when the form is submitted
+function showIncomeSuccessMessage() {
+    document.getElementById("successIncomeMessage").style.display = "block"; // Show the success message
+}
+
+
+function showIncomeFailMessage() {
+    document.getElementById("failIncomeMessage").style.display = "block"; // Show the success message
+}
+
 
 

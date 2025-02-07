@@ -39,6 +39,7 @@ def index():
         "session_date": session.get("date", None),
         "session_category": session.get("category", None),
         "session_memo": session.get("memo", ''),
+        "expense_income": session.get("expense_income", 0),
 
         # for totals
         "chosen_month": session.get("chosen_month", datetime.datetime.now(tz=EST).month),
@@ -54,6 +55,7 @@ def index():
 
     total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year) # [balance, expenses, income]
     trans_list = read_transactions(chosen_month, chosen_year)
+    income_list = read_income(chosen_month, chosen_year)
     
     # format differences for presentation
     for i in range(3):
@@ -74,10 +76,10 @@ def index():
     if isinstance(session_vars["chosen_month"], int):
         chosen_month_string = int_to_month[session_vars["chosen_month"]]
         
-    return render_template("index.html", trans_list=trans_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
+    return render_template("index.html", trans_list=trans_list, income_list=income_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
     
     
-@bp.route('/submit', methods=['POST'])
+@bp.route('/submit-transaction', methods=['POST'])
 def submit():
     amount = request.form['amount']
     category = request.form['hidden-category']
@@ -108,6 +110,42 @@ def submit():
         if memo:
             session['memo'] = memo
     
+    session['expense_income'] = 0
+
+    return redirect(url_for("run_website.index"))
+
+
+@bp.route('/submit-income', methods=['POST'])
+def submit_income():
+    amount = request.form['amount']
+    date = request.form['date']
+    if request.form.get('memo'):
+        memo = request.form['memo']
+    else:
+        memo = None 
+
+    session['chosen_month'] = int(request.form['month'])
+    session['chosen_year'] = int(request.form['year'])
+
+    parsed_date_full = parse_date(date) # format date for comparison, to add to db
+    parsed_date = parsed_date_full.date()
+
+    current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
+
+    if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
+        write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo)
+        update_totals(parsed_date_full.month, parsed_date_full.year)
+        session['submit_successful'] = True
+    else:
+        # if the date is in the future, notify user, add info to session so it stays in the input boxes
+        session['submit_successful'] = False
+        session['amount'] = amount
+        session['date'] = date
+        if memo:
+            session['memo'] = memo
+
+    session['expense_income'] = 1
+    
     return redirect(url_for("run_website.index"))
 
 
@@ -131,6 +169,19 @@ def delete():
     session['chosen_year'] = int(request.form['year'])
 
     delete_transaction(transaction_id)
+    update_totals()
+
+    # Feedback that transaction has been deleted?
+
+    return redirect(url_for("run_website.index"))
+
+@bp.route('/delete-income', methods=['POST'])
+def delete_income():
+    income_id = request.form['income_id']
+    session['chosen_month'] = int(request.form['month'])
+    session['chosen_year'] = int(request.form['year'])
+
+    delete_income(income_id)
     update_totals()
 
     # Feedback that transaction has been deleted?

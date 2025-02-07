@@ -56,6 +56,37 @@ def delete_transaction(trans_id):
     db.execute("DELETE FROM TRANSACTIONS WHERE TRANS_ID = ?", (trans_id,))
     db.commit()
 
+def write_income(user, amount, date, memo):
+    db = get_db()
+    res = db.execute("SELECT MAX(INCOME_ID) FROM INCOME")
+    max_id = res.fetchone()[0]
+    new_id = 0
+    if max_id is not None:
+        new_id = max_id + 1
+    else:
+        new_id = 0
+
+    amount = amount 
+    
+    if str(amount)[0] == '$':
+        amount = int(str(amount)[1:])
+
+    data = (new_id, amount, date, memo if memo else '')
+    db.execute(f"INSERT INTO INCOME VALUES(?, ?, ?, ?)", data)
+    db.commit()
+
+def read_income(month, year):
+    db = get_db()
+    res = db.execute("SELECT * FROM INCOME WHERE MONTH = ? AND YEAR = ? ORDER BY INCOME_DATE DESC", (month, year)) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
+    income_list = res.fetchall()
+
+    return income_list
+
+def delete_income(income_id):
+    db = get_db()
+    db.execute("DELETE FROM INCOME WHERE INCOME_ID = ?", (income_id,))
+    db.commit()
+
 # once a new month is picked, check if it exists in the TOTALS_PER_MONTH table
 def check_and_read_month_totals(month, year):
     db = get_db()
