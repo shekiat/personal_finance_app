@@ -82,6 +82,12 @@ const incomeForm = document.getElementById("incomeForm");
 const transactionTable = document.getElementById("transactionTable");
 const incomeTable = document.getElementById("incomeTable");
 
+const transactionSuccessMessage = document.getElementById("transactionSuccessMessage");
+const incomeSuccessMessage = document.getElementById("incomeSuccessMessage");
+
+const failDateMessage = document.getElementById("failDateMessage");
+const failAmountMessage = document.getElementById("failAmountMessage");
+
 if (expense_income == 0) {
     addExpense.style.display = "none";
     incomeForm.style.display = "none";
@@ -103,6 +109,10 @@ addIncome.addEventListener("click", function() {
 
     transactionTable.style.display = "none";
     incomeTable.style.display = "block";
+    
+    incomeSuccessMessage.style.display = "none";
+    failDateMessage.style.display = "none";
+    failAmountMessage.style.display = "none";
 });
 
 addExpense.addEventListener("click", function() {
@@ -116,29 +126,31 @@ addExpense.addEventListener("click", function() {
 
     transactionTable.style.display = "block";
     incomeTable.style.display = "none";
+
+    transactionSuccessMessage.style.display = "none";
+    failDateMessage.style.display = "none";
+    failAmountMessage.style.display = "none";
 });
 
 
 
-// Displays the success/fail message when the form is submitted
+// Displays the success message when the transaction/income form is submitted
 function showSuccessMessage() {
     document.getElementById("successMessage").style.display = "block"; // Show the success message
 }
 
-
-function showFailMessage() {
-    document.getElementById("failMessage").style.display = "block"; // Show the success message
-}
-
-
-// Displays the success/fail message when the form is submitted
+// Displays the success message when the transaction/income form is submitted
 function showIncomeSuccessMessage() {
-    document.getElementById("successIncomeMessage").style.display = "block"; // Show the success message
+    document.getElementById("incomeSuccessMessage").style.display = "block"; // Show the success message
 }
 
+// Displays fail message based on reason
+function showFailAmountMessage() {
+    document.getElementById("failAmountMessage").style.display = "block"; // Show the success message
+}
 
-function showIncomeFailMessage() {
-    document.getElementById("failIncomeMessage").style.display = "block"; // Show the success message
+function showFailDateMessage() {
+    document.getElementById("failDateMessage").style.display = "block"; // Show the success message
 }
 
 

@@ -10,7 +10,7 @@ from werkzeug.exceptions import abort
 import pytz
 EST = pytz.timezone("US/Eastern")
 
-bp = Blueprint('run_website', __name__)
+bp = Blueprint('home', __name__)
 
 int_to_month = {
     1 : "January",
@@ -28,13 +28,14 @@ int_to_month = {
 }
 
 @bp.route('/')
-def index():
+def home():
     # once information appearing in totals is implemented, may have to change session vars logic
 
     # if called through "/submit", get whether the submit was successful; if called through "/month-change", get the month and year
     session_vars = {
         # for transactions
         "submit_successful": session.get("submit_successful", None),
+        "unsuccessful_reason": session.get("unsuccessful_reason", -1),
         "session_amount": session.get("amount", None),
         "session_date": session.get("date", None),
         "session_category": session.get("category", None),
@@ -76,7 +77,7 @@ def index():
     if isinstance(session_vars["chosen_month"], int):
         chosen_month_string = int_to_month[session_vars["chosen_month"]]
         
-    return render_template("index.html", trans_list=trans_list, income_list=income_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
+    return render_template("home.html", trans_list=trans_list, income_list=income_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
     
     
 @bp.route('/submit-transaction', methods=['POST'])
@@ -97,26 +98,38 @@ def submit():
 
     current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
 
-    if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-        write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo)
-        update_totals(parsed_date_full.month, parsed_date_full.year)
-        session['submit_successful'] = True
-    else:
-        # if the date is in the future, notify user, add info to session so it stays in the input boxes
+    try:
+        float(amount)
+
+        if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
+            write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo)
+            update_totals(parsed_date_full.month, parsed_date_full.year)
+            session['submit_successful'] = True
+        else:
+            # if the date is in the future, notify user, add info to session so it stays in the input boxes
+            session['submit_successful'] = False
+            session['unsuccessful_reason'] = "date"
+            session['amount'] = amount
+            session['category'] = category
+            session['date'] = date
+            if memo:
+                session['memo'] = memo       
+    except ValueError:
         session['submit_successful'] = False
         session['amount'] = amount
         session['category'] = category
         session['date'] = date
         if memo:
-            session['memo'] = memo
+            session['memo'] = memo   
+        session['unsuccessful_reason'] = "amount"
     
     session['expense_income'] = 0
 
-    return redirect(url_for("run_website.index"))
+    return redirect(url_for("home.home"))
 
 
 @bp.route('/submit-income', methods=['POST'])
-def submit_income():
+def submit_inc():
     amount = request.form['amount']
     date = request.form['date']
     if request.form.get('memo'):
@@ -132,34 +145,47 @@ def submit_income():
 
     current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
 
-    if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-        write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo)
-        update_totals(parsed_date_full.month, parsed_date_full.year)
-        session['submit_successful'] = True
-    else:
-        # if the date is in the future, notify user, add info to session so it stays in the input boxes
+    try:
+        float(amount)
+        if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
+            write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo)
+            update_totals(parsed_date_full.month, parsed_date_full.year)
+            session['submit_successful'] = True
+        else:
+            # if the date is in the future, notify user, add info to session so it stays in the input boxes
+            session['submit_successful'] = False
+            session['amount'] = amount
+            session['date'] = date
+            if memo:
+                session['memo'] = memo
+
+            session["unsuccessful_reason"] = "date"
+    except ValueError:
         session['submit_successful'] = False
         session['amount'] = amount
         session['date'] = date
         if memo:
             session['memo'] = memo
 
+        session['unsuccessful_reason'] = "amount"
+
     session['expense_income'] = 1
     
-    return redirect(url_for("run_website.index"))
+    return redirect(url_for("home.home"))
 
 
 @bp.route('/submit-date', methods=['POST'])
 def month_change():
     month = request.form["month"]
     year = request.form["year"]
+    session['expense_income'] = request.form['expense_income']
 
     month_number = datetime.datetime.strptime(month, "%B").month
 
     session['chosen_month'] = int(month_number)
     session['chosen_year'] = int(year)
 
-    return redirect(url_for("run_website.index"))
+    return redirect(url_for("home.home"))
 
 
 @bp.route('/delete-transaction', methods=['POST'])
@@ -173,17 +199,19 @@ def delete():
 
     # Feedback that transaction has been deleted?
 
-    return redirect(url_for("run_website.index"))
+    return redirect(url_for("home.home"))
 
 @bp.route('/delete-income', methods=['POST'])
-def delete_income():
+def delete_inc():
     income_id = request.form['income_id']
     session['chosen_month'] = int(request.form['month'])
     session['chosen_year'] = int(request.form['year'])
+
+    session['expense_income'] = 1
 
     delete_income(income_id)
     update_totals()
 
     # Feedback that transaction has been deleted?
 
-    return redirect(url_for("run_website.index"))
+    return redirect(url_for("home.home"))
