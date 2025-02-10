@@ -5,8 +5,11 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.secret_key="secret_key"
 
-    from . import run_website
-    app.register_blueprint(run_website.bp)
+    from . import home
+    app.register_blueprint(home.bp)
+
+    from . import dashboard
+    app.register_blueprint(dashboard.bp)
 
     from . import db
     db.init_app(app)

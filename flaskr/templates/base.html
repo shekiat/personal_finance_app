@@ -1,0 +1,30 @@
+{% block header %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Personal Finance App</title>
+        <link rel="stylesheet" href="../static/css/styles.css">
+        
+    </head>
+    
+    <button id="homeButton" onclick="goToHome()">Home</button>
+    <button id="dashboardButton" onclick="goToDashboard()">Dashboard</button>
+
+    <script>
+        function goToHome() {
+            window.location.href = "/";  // Replace with your actual route
+        }
+    </script>
+    
+    <script>
+        function goToDashboard() {
+            window.location.href = "/dashboard";  // Replace with your actual route
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+<div><p>Dashboard</p></div>
+{% endblock %}
