@@ -13,5 +13,23 @@ EST = pytz.timezone("US/Eastern")
 bp = Blueprint('dashboard', __name__)
 
 @bp.route('/dashboard')
-def home():
-    return render_template('dashboard.html')
+def dashboard():
+    # Define Plot Data 
+    labels = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June'
+    ]
+ 
+    data = [0, 10, 15, 8, 22, 18, 25]
+ 
+    # Return the components to the HTML template 
+    return render_template(
+        template_name_or_list='dashboard.html',
+        data=data,
+        labels=labels,
+    )
+

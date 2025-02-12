@@ -10,6 +10,11 @@ body {
     padding: 0;
 }
 
+.page-header {
+    position: fixed;
+    background-color: black;
+}
+
 .dashboard {
     text-align: center;
     padding: 20px;
