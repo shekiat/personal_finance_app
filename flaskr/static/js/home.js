@@ -154,4 +154,14 @@ function showFailDateMessage() {
 }
 
 
+// keep track of where user scrolled to
+window.addEventListener("beforeunload", () => {
+    localStorage.setItem("scrollPosition", window.scrollY);
+});
 
+window.addEventListener("load", () => {
+    let scrollPosition = localStorage.getItem("scrollPosition");
+    if (scrollPosition) {
+        window.scrollTo(0, parseInt(scrollPosition));
+    }
+});

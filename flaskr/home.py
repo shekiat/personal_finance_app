@@ -125,7 +125,7 @@ def submit():
     
     session['expense_income'] = 0
 
-    return redirect(url_for("home.home"))
+    return redirect(url_for("home.html"))
 
 
 @bp.route('/submit-income', methods=['POST'])
@@ -171,7 +171,7 @@ def submit_inc():
 
     session['expense_income'] = 1
     
-    return redirect(url_for("home.home"))
+    return redirect(url_for("home.html"))
 
 
 @bp.route('/submit-date', methods=['POST'])
@@ -185,7 +185,7 @@ def month_change():
     session['chosen_month'] = int(month_number)
     session['chosen_year'] = int(year)
 
-    return redirect(url_for("home.home"))
+    return redirect(url_for("home.html"))
 
 
 @bp.route('/delete-transaction', methods=['POST'])
@@ -214,4 +214,4 @@ def delete_inc():
 
     # Feedback that transaction has been deleted?
 
-    return redirect(url_for("home.home"))
+    return redirect(url_for("home.html"))
