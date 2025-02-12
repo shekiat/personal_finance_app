@@ -136,3 +136,26 @@ def delete():
     # Feedback that transaction has been deleted?
 
     return redirect(url_for("run_website.index"))
+
+
+@bp.route('/chart_test.html')
+def homepage():
+ 
+    # Define Plot Data 
+    labels = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+    ]
+ 
+    data = [0, 10, 15, 8, 22, 18, 25]
+ 
+    # Return the components to the HTML template 
+    return render_template(
+        charts='chart_test.html',
+        data=data,
+        labels=labels,
+    )
