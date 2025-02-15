@@ -10,6 +10,11 @@ body {
     padding: 0;
 }
 
+.page-header {
+    position: fixed;
+    background-color: black;
+}
+
 .dashboard {
     text-align: center;
     padding: 20px;
@@ -30,6 +35,16 @@ body {
     padding: 20px;
 }
 
+.content #toggleBtn {
+    font-size: 16px;
+    width: 140px;
+    height: 60px;
+}
+
+.content .stats{
+    margin-top: 60px;
+}
+
 header {
     display: flex;
     justify-content: space-between;
@@ -43,8 +58,8 @@ button {
     border-radius: 5px;
     padding: 10px 20px;
     border: none;
-    width: 100px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
    
 }
 
@@ -78,31 +93,52 @@ button:hover {
     border-radius: 10px;
 }
 
+.transactions {
+    margin-top: 50px;
+}
+
 .transactions table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
 }
 
-.transaction-form input{
-    margin: 0 10px;
+.transaction-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
+.transaction-form form {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 5px; 
+    flex-wrap: nowrap; 
+    
+}
+
+
+.transaction-form label {
+    margin-right: 0;
+}
+
+
 .transaction-form button {
-    margin: 0 15px;
+   
+    margin: 0 10px;
+    
 }
 
 .transaction-form #category{
     width: 100px;
     height: 20px;
+    margin-left: 10px;
 }
 
-.transaction-form #category button{
-    margin: 20px 10px;
-}
 
 .transaction-form #subCategoryBtn {
-    width: 130px;
+    width: 200px;
     display:none;
 
 }
@@ -125,6 +161,17 @@ button:hover {
 
 .transactions td.pending {
     color: yellow;
+}
+
+.income table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.income th, .transactions td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
 }
 
 

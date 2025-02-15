@@ -1,0 +1,45 @@
+{% extends 'base.html' %} <!--extend from base.html-->
+
+{% block content %} <!--replace "block content" section in base.html-->
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<title>Chartjs Charts</title>
+</head>
+
+<body>
+	<div style="height: 50vh; width: 50%;">
+		<canvas id="myChart"></canvas>
+	</div>
+
+    <script>
+        // Ensure JSON is properly embedded
+        const chartLabels = {{ labels | tojson | safe }};
+        const chartData = {{ data | tojson | safe }};
+
+        console.log("Chart Labels:", chartLabels);
+        console.log("Chart Data:", chartData);
+
+        const data = {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Sales',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: chartData,
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: { maintainAspectRatio: false }
+        };
+
+        new Chart(document.getElementById('myChart'), config);
+
+    </script>
+
+    
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% block header %} <!--does not get replaced in other html files ==> stays at top of page (header)-->
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Personal Finance App</title>
+        <link rel="stylesheet" href="../static/css/styles.css">
+        
+    </head>
+    
+    <div class="page-header">
+        <button id="homeButton" onclick="goToHome()">Home</button>
+        <button id="dashboardButton" onclick="goToDashboard()">Dashboard</button>
+
+        <script>
+            function goToHome() {
+                window.location.href = "/";  // Replace with your actual route
+            }
+        </script>
+        
+        <script>
+            function goToDashboard() {
+                window.location.href = "/dashboard";  // Replace with your actual route
+            }
+        </script>
+    </div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
