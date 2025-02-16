@@ -14,19 +14,32 @@
     <script>
         // Ensure JSON is properly embedded
         const chartLabels = {{ labels | tojson | safe }};
-        const chartData = {{ data | tojson | safe }};
-
-        console.log("Chart Labels:", chartLabels);
-        console.log("Chart Data:", chartData);
+        const totalBalances = {{ total_balances | tojson | safe }};
+        const totalExpenses = {{ total_expenses | tojson | safe }};
+        const totalIncomes = {{ total_incomes | tojson | safe }};
 
         const data = {
             labels: chartLabels,
-            datasets: [{
-                label: 'Sales',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: chartData,
-            }]
+            datasets: [
+                {
+                    label: 'Balance',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: totalBalances,
+                },
+                {
+                    label: 'Expenses',
+                    backgroundColor: 'rgb(99, 255, 132)',
+                    borderColor: 'rgb(99, 255, 132)',
+                    data: totalExpenses,
+                },
+                {
+                    label: 'Income',
+                    backgroundColor: 'rgb(132, 99, 255)',
+                    borderColor: 'rgb(132, 99, 255)',
+                    data: totalIncomes,
+                },
+            ]
         };
 
         const config = {

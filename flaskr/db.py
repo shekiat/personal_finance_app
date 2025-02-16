@@ -25,6 +25,9 @@ def parse_date(date):
         except ValueError:
             return None  # Return None if the input is not a valid date
 
+
+
+# transactions
 def write_transaction(user, amount, date, category, memo):
     db = get_db()
     res = db.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS")
@@ -56,6 +59,9 @@ def delete_transaction(trans_id):
     db.execute("DELETE FROM TRANSACTIONS WHERE TRANS_ID = ?", (trans_id,))
     db.commit()
 
+
+
+# income
 def write_income(user, amount, date, memo):
     db = get_db()
     res = db.execute("SELECT MAX(INCOME_ID) FROM INCOME")
@@ -87,8 +93,11 @@ def delete_income(income_id):
     db.execute("DELETE FROM INCOME WHERE INCOME_ID = ?", (income_id,))
     db.commit()
 
+
+
+# totals
 # once a new month is picked, check if it exists in the TOTALS_PER_MONTH table
-def check_and_read_month_totals(month, year):
+def check_and_read_month_totals(month, year, for_dashboard):
     db = get_db()
     # get information from current month
     res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (month, year))
@@ -100,23 +109,26 @@ def check_and_read_month_totals(month, year):
     if len(res_totals) != 0:
         total_values = res_totals[0]
 
-    # get information from past month
-    res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (int(month) - 1 if month != 1 else 12, year if month != 1 else int(year) - 1))
-    res_totals = res.fetchall()
-
+    print(total_values)
+    
     total_differences = list(total_values)
     total_differences_percs = list(total_values)
     past_month_values = [0, 0, 0]
-    
-    # if month is in db fetch diffs
-    if len(res_totals) != 0 and res_totals[0][2] is not None:
-        past_month_values = res_totals[0]
-        total_differences = [round(x - y, 2) for x, y in zip(total_differences, past_month_values)]
-        for i in range(3):
-            if past_month_values[i] != 0:
-                total_differences_percs[i] = round(total_differences_percs[i] / past_month_values[i] * 100 - 100, 2)
-    else:
-        total_differences = [0, 0, 0]
+
+    if not for_dashboard:
+        # get information from past month
+        res = db.execute("SELECT TOTAL_BALANCE, TOTAL_EXPENSES, TOTAL_INCOME FROM TOTALS_PER_MONTH WHERE MONTH = ? AND YEAR = ?", (int(month) - 1 if month != 1 else 12, year if month != 1 else int(year) - 1))
+        res_totals = res.fetchall()
+        
+        # if month is in db fetch diffs
+        if len(res_totals) != 0 and res_totals[0][2] is not None:
+            past_month_values = res_totals[0]
+            total_differences = [round(x - y, 2) for x, y in zip(total_differences, past_month_values)]
+            for i in range(3):
+                if past_month_values[i] != 0:
+                    total_differences_percs[i] = round(total_differences_percs[i] / past_month_values[i] * 100 - 100, 2)
+        else:
+            total_differences = [0, 0, 0]
 
     return total_values, total_differences, total_differences_percs
 
@@ -144,6 +156,28 @@ def read_categories():
     categories = [row['TRANS_CATEGORY'] for row in res.fetchall()]
 
     return categories
+
+
+
+# dashboard
+def read_for_line_graph(start_month, end_month):
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    year = 2025
+
+    total_balances = []
+    total_expenses = []
+    total_incomes = []
+
+    for month in months[months.index(start_month): months.index(end_month) + 1]:
+        total_values, _, _ = check_and_read_month_totals(months.index(month), year, True)
+        total_balances.append(total_values[0])
+        total_expenses.append(total_values[1])
+        total_incomes.append(total_values[2])
+
+    return total_balances, total_expenses, total_incomes
+
+
+
 
 def init_db():
     db = get_db()

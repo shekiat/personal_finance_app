@@ -54,7 +54,7 @@ def home():
     chosen_month = session_vars['chosen_month']
     chosen_year = session_vars['chosen_year']
 
-    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year) # [balance, expenses, income]
+    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year, False) # [balance, expenses, income]
     trans_list = read_transactions(chosen_month, chosen_year)
     income_list = read_income(chosen_month, chosen_year)
     
