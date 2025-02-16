@@ -54,7 +54,7 @@ def home():
     chosen_month = session_vars['chosen_month']
     chosen_year = session_vars['chosen_year']
 
-    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year) # [balance, expenses, income]
+    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year, False) # [balance, expenses, income]
     trans_list = read_transactions(chosen_month, chosen_year)
     income_list = read_income(chosen_month, chosen_year)
     
@@ -125,7 +125,7 @@ def submit():
     
     session['expense_income'] = 0
 
-    return redirect(url_for("home.html"))
+    return redirect(url_for("home.home"))
 
 
 @bp.route('/submit-income', methods=['POST'])
@@ -171,7 +171,7 @@ def submit_inc():
 
     session['expense_income'] = 1
     
-    return redirect(url_for("home.html"))
+    return redirect(url_for("home.home"))
 
 
 @bp.route('/submit-date', methods=['POST'])
@@ -185,7 +185,7 @@ def month_change():
     session['chosen_month'] = int(month_number)
     session['chosen_year'] = int(year)
 
-    return redirect(url_for("home.html"))
+    return redirect(url_for("home.home"))
 
 
 @bp.route('/delete-transaction', methods=['POST'])
@@ -214,4 +214,4 @@ def delete_inc():
 
     # Feedback that transaction has been deleted?
 
-    return redirect(url_for("home.html"))
+    return redirect(url_for("home.home"))
