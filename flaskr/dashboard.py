@@ -12,7 +12,7 @@ EST = pytz.timezone("US/Eastern")
 
 bp = Blueprint('dashboard', __name__)
 
-@bp.route('/dashboard')
+@bp.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     total_incomes, total_expenses, total_balances = read_for_line_graph("January", "December")
@@ -22,7 +22,6 @@ def dashboard():
     print(total_expenses)
 
     pie_labels = ["Income", "Expenses", "Savings", "Investments"]
- 
     pie_data = [25, 25, 25, 25]
 
     if request.method == "POST":
@@ -81,3 +80,4 @@ def dashboard():
 #         selected_month=selected_month,
 #         months=months
 #     )
+    )
