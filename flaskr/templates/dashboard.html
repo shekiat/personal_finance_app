@@ -1,58 +1,176 @@
-{% extends 'base.html' %} <!--extend from base.html-->
 
-{% block content %} <!--replace "block content" section in base.html-->
+{% extends 'base.html' %}
+
+{% block content %}
 <head>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<title>Chartjs Charts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata"></script>
+
+    <title>Dashboard</title>
 </head>
 
 <body>
-	<div style="height: 50vh; width: 50%;">
-		<canvas id="myChart"></canvas>
-	</div>
+    <header class="dash-header">
+        <h1>Dashboard</h1>
+    </header>
 
+    <div style="height: 50vh; width: 50%;">
+        <canvas id="incomeExpenseLineChart"></canvas>
+    </div>
+
+    <div style="height: 50vh; width: 50%;">
+        <canvas id="balanceLineChart"></canvas>
+    </div>
+
+    <div style="height: 50vh; width: 50%;">
+        <canvas id="pieChart"></canvas>
+    </div>
+
+    <form method="POST" action="{{ url_for('dashboard.dashboard') }}">
+        <label for="month">Choose a month:</label>
+        <select id="month" name="month">
+            {% for month in months %}
+                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>{{ month }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+
+    <!----- Line Graph and Pie Chart ----->
     <script>
         // Ensure JSON is properly embedded
-        const chartLabels = {{ labels | tojson | safe }};
-        const totalBalances = {{ total_balances | tojson | safe }};
-        const totalExpenses = {{ total_expenses | tojson | safe }};
-        const totalIncomes = {{ total_incomes | tojson | safe }};
+        const lineChartLabels = {{ line_labels | tojson | safe }};
+        const incomeChartData = {{ total_incomes | tojson | safe }};
+        const expensesChartData = {{ total_expenses | tojson | safe }};
+        const balancesChartData = {{ total_balances | tojson | safe }};
+        const pieChartData = {{ pie_data | tojson | safe }};
+        const pieChartLabels = {{ pie_labels | tojson | safe }};
 
-        const data = {
-            labels: chartLabels,
+        console.log("Line Chart Labels:", lineChartLabels);
+        console.log("Income Chart Data:", incomeChartData);
+        console.log("Expenses Chart Data:", expensesChartData);
+        console.log("Balances Chart Data:", expensesChartData);
+        console.log("Pie Chart Labels:", pieChartLabels);
+        console.log("Pie Chart Data:", pieChartData);
+
+        // income/expenses line graph
+        const incomeExpenseData = {
+            labels: lineChartLabels,
             datasets: [
                 {
-                    label: 'Balance',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: totalBalances,
+                    label: 'Income',
+                    backgroundColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: incomeChartData,
                 },
                 {
                     label: 'Expenses',
-                    backgroundColor: 'rgb(99, 255, 132)',
-                    borderColor: 'rgb(99, 255, 132)',
-                    data: totalExpenses,
-                },
-                {
-                    label: 'Income',
-                    backgroundColor: 'rgb(132, 99, 255)',
-                    borderColor: 'rgb(132, 99, 255)',
-                    data: totalIncomes,
-                },
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: expensesChartData,
+                }
             ]
         };
 
-        const config = {
+        const incomeExpenseConfig = {
             type: 'line',
-            data: data,
+            data: incomeExpenseData,
+            options: {
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        min: 0, // Set the minimum value for the y-axis
+                        max: 1000 // Set the maximum value for the y-axis
+                    }
+                },
+                // Drag data plugin options
+                plugins: {
+                    dragData: {
+                        round: 1,
+                        onDragStart: function (e, datasetIndex, index, value) {
+                            console.log(`Start dragging: ${value}`);
+                        },
+                        onDrag: function (e, datasetIndex, index, value) {
+                            console.log(`Dragging: ${value}`);
+                        },
+                        onDragEnd: function (e, datasetIndex, index, value) {
+                            console.log(`End dragging: ${value}`);
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('incomeExpenseLineChart'), incomeExpenseConfig);
+
+        // balances line graph
+        const balanceData = {
+            labels: lineChartLabels,
+            datasets: [
+                {
+                    label: 'Balance',
+                    backgroundColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    data: balancesChartData,
+                }
+            ]
+        };
+
+        const balanceConfig = {
+            type: 'line',
+            data: balanceData,
+            options: {
+                maintainAspectRatio: false,
+
+                scales: {
+                    y: {
+                        min: 0, // Set the minimum value for the y-axis
+                        max: 1000 // Set the maximum value for the y-axis
+                    }
+                },
+                // Drag data plugin options
+                plugins: {
+                    dragData: {
+                        round: 1,
+                        onDragStart: function (e, datasetIndex, index, value) {
+                            console.log(`Start dragging: ${value}`);
+                        },
+                        onDrag: function (e, datasetIndex, index, value) {
+                            console.log(`Dragging: ${value}`);
+                        },
+                        onDragEnd: function (e, datasetIndex, index, value) {
+                            console.log(`End dragging: ${value}`);
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('balanceLineChart'), balanceConfig);
+
+    
+        // per month category pie chart
+        const pieData = {
+            labels: pieChartLabels,
+            datasets: [{
+                label: 'Monthly Balance',
+                backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 206, 86)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)'],
+                data: pieChartData,
+            }]
+        };
+
+        const pieConfig = {
+            type: 'pie',
+            data: pieData,
             options: { maintainAspectRatio: false }
         };
 
-        new Chart(document.getElementById('myChart'), config);
-
+        new Chart(document.getElementById('pieChart'), pieConfig);
     </script>
 
-    
+
+
 </body>
 </html>
 {% endblock %}
