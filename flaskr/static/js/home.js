@@ -27,6 +27,7 @@ const categoryInput = document.getElementById("add-category");
 const hiddenCategory = document.getElementById("hidden-category");
 hiddenCategory.value = categorySelect.value;
 
+// executes on the click of anything
 document.addEventListener("click", function (e) {
     // Check if the input field is visible
     if (input.style.display === "block") {

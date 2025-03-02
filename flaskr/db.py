@@ -5,6 +5,8 @@ import click
 import os
 from dateutil.parser import parse
 
+month_to_int = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12}
+
 def get_db():
     if 'db' not in g:
         db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database_files', 'pf_app.db')
@@ -160,21 +162,32 @@ def read_categories():
 
 
 # dashboard
-def read_for_line_graph(start_month, end_month):
+def read_month_totals_for_line_graph(year):
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    year = 2025
 
     total_balances = []
     total_expenses = []
     total_incomes = []
 
-    for month in months[months.index(start_month): months.index(end_month) + 1]:
-        total_values, _, _ = check_and_read_month_totals(months.index(month), year, True)
+    for month in months:
+        total_values, _, _ = check_and_read_month_totals(months.index(month) + 1, year, True)
         total_balances.append(total_values[0])
         total_expenses.append(total_values[1])
         total_incomes.append(total_values[2])
 
     return total_balances, total_expenses, total_incomes
+
+def read_category_totals_for_pie_graph(month, year=2025):
+    db = get_db()
+
+    res = db.execute("SELECT TRANS_CATEGORY, SUM(TRANS_AMOUNT) AS AMOUNT FROM TRANSACTIONS WHERE MONTH = ? AND YEAR = ? GROUP BY TRANS_CATEGORY", (month_to_int[month], year))
+    categories_totals = res.fetchall()
+    categories_totals = [dict(row) for row in categories_totals]
+    pie_dict = {}
+    for i in range(len(categories_totals)):
+        pie_dict[categories_totals[i]["TRANS_CATEGORY"]] = categories_totals[i]["AMOUNT"]
+
+    return pie_dict
 
 
 

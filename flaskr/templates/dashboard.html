@@ -1,176 +1,289 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
 <head>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <title>Dashboard</title>
 </head>
 
-<body>
+<body class="dash-body">
     <header class="dash-header">
         <h1>Dashboard</h1>
+            <h2> Yearly Finances Summary </h2>
     </header>
 
-    <div style="height: 50vh; width: 50%;">
-        <canvas id="incomeExpenseLineChart"></canvas>
-    </div>
+    <main class="dash-main"> 
+        <!-- Yearly form for both line graph and pie chart -->
+        <div class="year-form">
+            <label for="year-list">Choose a year:</label>
+            <select id="year-list" name="year-list">
+                {% for year in years %}
+                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <div style="height: 50vh; width: 50%;">
-        <canvas id="balanceLineChart"></canvas>
-    </div>
+        <div class="charts-container"></div>
+            <!-- Canvas elements for charts -->
+            <div class="chart-wrapper" style="height: 50vh; width: 50%;">
+                <canvas id="incomeExpenseLineChart"></canvas>
+            </div>
 
-    <div style="height: 50vh; width: 50%;">
-        <canvas id="pieChart"></canvas>
-    </div>
+            <div class="chart-wrapper" style="height: 50vh; width: 50%;">
+                <canvas id="balanceLineChart"></canvas>
+            </div>
 
-    <form method="POST" action="{{ url_for('dashboard.dashboard') }}">
-        <label for="month">Choose a month:</label>
-        <select id="month" name="month">
-            {% for month in months %}
-                <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>{{ month }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit">Submit</button>
-    </form>
+            <div class="chart-wrapper" style="height: 50vh; width: 50%;">
+                <canvas class="pieChart" id="pieChart"></canvas>
+            </div>
 
-    <!----- Line Graph and Pie Chart ----->
+            <div class="month-form">
+                <!-- month selection dropdown and button -->
+                <label for="month-list">Choose a month:</label>
+                <select id="month-list" name="month-list">
+                    {% for month in months %}
+                        <option value="{{ month }}" {% if month == selected_month %}selected{% endif %}>{{ month }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        
+    </main>
+
     <script>
-        // Ensure JSON is properly embedded
-        const lineChartLabels = {{ line_labels | tojson | safe }};
-        const incomeChartData = {{ total_incomes | tojson | safe }};
-        const expensesChartData = {{ total_expenses | tojson | safe }};
-        const balancesChartData = {{ total_balances | tojson | safe }};
-        const pieChartData = {{ pie_data | tojson | safe }};
-        const pieChartLabels = {{ pie_labels | tojson | safe }};
+        // store chart instances to update later
+        let incomeExpenseChart, balanceChart, pieChart;
 
-        console.log("Line Chart Labels:", lineChartLabels);
-        console.log("Income Chart Data:", incomeChartData);
-        console.log("Expenses Chart Data:", expensesChartData);
-        console.log("Balances Chart Data:", expensesChartData);
-        console.log("Pie Chart Labels:", pieChartLabels);
-        console.log("Pie Chart Data:", pieChartData);
+        function renderCharts(data) {
+            const lineChartLabels = data.line_labels;
+            const incomeChartData = data.total_incomes;
+            const expensesChartData = data.total_expenses;
+            const balancesChartData = data.total_balances;
+            const pieChartData = data.pie_data;
+            const pieChartLabels = data.pie_labels;
+            const maxIncomeExpense = data.max_income_expense;
+            const maxBalance = data.max_balance;
+            const minBalance = data.min_balance;
+            const pieColors = data.pie_colors;
 
-        // income/expenses line graph
-        const incomeExpenseData = {
-            labels: lineChartLabels,
-            datasets: [
-                {
-                    label: 'Income',
-                    backgroundColor: 'rgb(75, 192, 192)',
-                    borderColor: 'rgb(75, 192, 192)',
-                    data: incomeChartData,
-                },
-                {
-                    label: 'Expenses',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: expensesChartData,
-                }
-            ]
-        };
-
-        const incomeExpenseConfig = {
-            type: 'line',
-            data: incomeExpenseData,
-            options: {
-                maintainAspectRatio: false,
-
-                scales: {
-                    y: {
-                        min: 0, // Set the minimum value for the y-axis
-                        max: 1000 // Set the maximum value for the y-axis
+            // income/expense line chart
+            const incomeExpenseData = {
+                labels: lineChartLabels,
+                datasets: [
+                    {
+                        label: 'Income',
+                        backgroundColor: 'rgb(75, 192, 192)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        data: incomeChartData,
+                    },
+                    {
+                        label: 'Expenses',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: expensesChartData,
                     }
-                },
-                // Drag data plugin options
-                plugins: {
-                    dragData: {
-                        round: 1,
-                        onDragStart: function (e, datasetIndex, index, value) {
-                            console.log(`Start dragging: ${value}`);
-                        },
-                        onDrag: function (e, datasetIndex, index, value) {
-                            console.log(`Dragging: ${value}`);
-                        },
-                        onDragEnd: function (e, datasetIndex, index, value) {
-                            console.log(`End dragging: ${value}`);
+                ]
+            };
+
+            const incomeExpenseConfig = {
+                type: 'line',
+                data: incomeExpenseData,
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: maxIncomeExpense
+                        }
+                    },
+                    plugins: {
+                        dragData: {
+                            round: 1,
+                            onDragStart: function (e, datasetIndex, index, value) {
+                                console.log(`Start dragging: ${value}`);
+                            },
+                            onDrag: function (e, datasetIndex, index, value) {
+                                console.log(`Dragging: ${value}`);
+                            },
+                            onDragEnd: function (e, datasetIndex, index, value) {
+                                console.log(`End dragging: ${value}`);
+                            }
                         }
                     }
                 }
+            };
+
+            // destroy existing chart instance if present
+            if (incomeExpenseChart) {
+                incomeExpenseChart.destroy();
             }
-        };
+            incomeExpenseChart = new Chart(document.getElementById('incomeExpenseLineChart'), incomeExpenseConfig);
 
-        new Chart(document.getElementById('incomeExpenseLineChart'), incomeExpenseConfig);
-
-        // balances line graph
-        const balanceData = {
-            labels: lineChartLabels,
-            datasets: [
-                {
-                    label: 'Balance',
-                    backgroundColor: 'rgb(75, 192, 192)',
-                    borderColor: 'rgb(75, 192, 192)',
-                    data: balancesChartData,
-                }
-            ]
-        };
-
-        const balanceConfig = {
-            type: 'line',
-            data: balanceData,
-            options: {
-                maintainAspectRatio: false,
-
-                scales: {
-                    y: {
-                        min: 0, // Set the minimum value for the y-axis
-                        max: 1000 // Set the maximum value for the y-axis
+            // balances line chart
+            const balanceData = {
+                labels: lineChartLabels,
+                datasets: [
+                    {
+                        label: 'Balance',
+                        backgroundColor: 'rgb(75, 192, 192)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        data: balancesChartData,
                     }
-                },
-                // Drag data plugin options
-                plugins: {
-                    dragData: {
-                        round: 1,
-                        onDragStart: function (e, datasetIndex, index, value) {
-                            console.log(`Start dragging: ${value}`);
-                        },
-                        onDrag: function (e, datasetIndex, index, value) {
-                            console.log(`Dragging: ${value}`);
-                        },
-                        onDragEnd: function (e, datasetIndex, index, value) {
-                            console.log(`End dragging: ${value}`);
+                ]
+            };
+
+            const balanceConfig = {
+                type: 'line',
+                data: balanceData,
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: minBalance,
+                            max: maxBalance
+                        }
+                    },
+                    plugins: {
+                        dragData: {
+                            round: 1,
+                            onDragStart: function (e, datasetIndex, index, value) {
+                                console.log(`Start dragging: ${value}`);
+                            },
+                            onDrag: function (e, datasetIndex, index, value) {
+                                console.log(`Dragging: ${value}`);
+                            },
+                            onDragEnd: function (e, datasetIndex, index, value) {
+                                console.log(`End dragging: ${value}`);
+                            }
                         }
                     }
                 }
+            };
+
+            if (balanceChart) {
+                balanceChart.destroy();
             }
-        };
+            balanceChart = new Chart(document.getElementById('balanceLineChart'), balanceConfig);
 
-        new Chart(document.getElementById('balanceLineChart'), balanceConfig);
+            // category expenses per month pie chart
+            const pieData = {
+                labels: pieChartLabels,
+                datasets: [{
+                    label: 'Total',
+                    backgroundColor: pieColors,
+                    data: pieChartData,
+                }]
+            };
 
-    
-        // per month category pie chart
-        const pieData = {
-            labels: pieChartLabels,
-            datasets: [{
-                label: 'Monthly Balance',
-                backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 206, 86)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)'],
-                data: pieChartData,
-            }]
-        };
+            const pieConfig = {
+                type: 'pie',
+                data: pieData,
+                options: { 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    size: 18
+                                },
+                                color: 'white'
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            align: 'end',
+                            anchor: 'end',
+                            formatter: function(value, context) {
+                                return context.chart.data.labels[context.dataIndex];
+                            }
+                        }
+                    }
+                
+                }
+            };
 
-        const pieConfig = {
-            type: 'pie',
-            data: pieData,
-            options: { maintainAspectRatio: false }
-        };
+            if (pieChart) {
+                pieChart.destroy();
+            }
+            pieChart = new Chart(document.getElementById('pieChart'), pieConfig);
+        }
 
-        new Chart(document.getElementById('pieChart'), pieConfig);
+        // fetch data if month is updated
+        function updateDashboard() {
+            const monthSelect = document.getElementById("month-list");
+            const selectedMonth = monthSelect.value;
+            const yearSelect = document.getElementById("year-list");
+            const selectedYear = yearSelect.value;
+
+            fetch("/api/dashboard_data", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ selected_month: selectedMonth, selected_year: selectedYear})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Fetched data:", data);
+                renderCharts(data);
+            })
+            .catch(error => {
+                console.error("Error fetching dashboard data:", error);
+            });
+        }
+
+        document.getElementById("month-list").addEventListener("change", function(e) {
+            e.preventDefault();
+            updateDashboard();
+        });
+
+        document.getElementById("year-list").addEventListener("change", function(e) {
+            e.preventDefault();
+            updateDashboard();
+        });
+
+
+        // load default data when dashboard is chosen
+        document.addEventListener("DOMContentLoaded", function() {
+            const lineChartLabels = {{ line_labels | tojson | safe }};
+            const incomeChartData = {{ total_incomes | tojson | safe }};
+            const expensesChartData = {{ total_expenses | tojson | safe }};
+            const balancesChartData = {{ total_balances | tojson | safe }};
+            const pieChartData = {{ pie_data | tojson | safe }};
+            const pieChartLabels = {{ pie_labels | tojson | safe }};
+            const maxIncomeExpense = {{ max_income_expense | tojson | safe}};
+            const maxBalance = {{ max_balance | tojson | safe}};
+            const minBalance = {{ min_balance | tojson | safe}};
+            const pieColors = {{ pie_colors | tojson | safe}};
+
+            const initialData = {
+                line_labels: lineChartLabels,
+                total_incomes: incomeChartData,
+                total_expenses: expensesChartData,
+                total_balances: balancesChartData,
+                pie_data: pieChartData,
+                pie_labels: pieChartLabels,
+                selected_month: "{{ selected_month }}",
+                selected_year: "{{ selected_year }}",
+                max_income_expense: maxIncomeExpense,
+                max_balance: maxBalance,
+                min_balance: minBalance,
+                pie_colors: pieColors
+            };
+
+            renderCharts(initialData);
+        });
     </script>
-
-
-
 </body>
 </html>
 {% endblock %}

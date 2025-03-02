@@ -10,7 +10,9 @@
 
 <body>
 <nav class="page-header">
-    <h2>Personal Finance App</h2>
+    <div class="dash-header-title">
+        <h3>Personal Finance App</h1>
+    </div>
     <button id="homeButton" onclick="goToHome()">Home</button>
     <button id="dashboardButton" onclick="goToDashboard()">Dashboard</button>
 
@@ -35,46 +37,6 @@
 <footer class="page-footer">
     <h3>Shekia Tillerson</h3>
     <h3>Nick Steiner</h3>
-    &copy; 2025 Personal Finance App
+    &copy; 2023 Personal Finance App
 </footer>
 </body>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Personal Finance App</title>
-        <link rel="stylesheet" href="../static/css/styles.css">
-        
-    </head>
-    
-    <body>
-    <nav class="page-header">
-        <h2>Personal Finance App</h2>
-        <button id="homeButton" onclick="goToHome()">Home</button>
-        <button id="dashboardButton" onclick="goToDashboard()">Dashboard</button>
-
-        <script>
-            function goToHome() {
-                window.location.href = "/";  // Replace with your actual route
-            }
-        </script>
-        
-        <script>
-            function goToDashboard() {
-                window.location.href = "/dashboard";  // Replace with your actual route
-            }
-        </script>
-    </nav>
-
-    <div class="content">
-        {% block content %}
-        {% endblock %}
-    </div>
-
-    <footer class="page-footer">
-        <h3>Shekia Tillerson</h3>
-        <h3>Nick Steiner</h3>
-        &copy; 2023 Personal Finance App
-    </footer>
-    </body>
