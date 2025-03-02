@@ -61,9 +61,9 @@ def home():
     # format differences for presentation
     for i in range(3):
         if total_diffs[i] < 0:
-            total_diffs[i] = "- $" + str(total_diffs[i])[1:]
+            total_diffs[i] = "-$" + str(total_diffs[i])[1:]
         elif total_diffs[i] > 0:
-            total_diffs[i] = "$" + str(total_diffs[i])
+            total_diffs[i] = "+$" + str(total_diffs[i])
 
     # get categories for drop down
     category_list = read_categories()
