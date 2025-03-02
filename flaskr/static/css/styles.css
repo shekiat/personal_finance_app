@@ -13,17 +13,19 @@ body {
 
 .page-header {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     position: fixed;
     width: 100%;
     font-family: "Poppins", sans-serif; 
     background-color: rgb(25, 26, 39);
-    padding: 10px 0;
 }
 
-.page-header .dash-header-title{
-    margin-left: 20px;
+.page-header .h2{
+    position: left;
+    font-weight: 500;
+    padding: 8px 8px;
+    margin-bottom: 20px;
 }
 
 .page-header button{
@@ -38,7 +40,14 @@ body {
     cursor: pointer;
 }
 
-/* ----- Home Page Styling ------ */
+.dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin-top: 70px;
+}
+
 .home {
     text-align: center;
     padding: 20px;
@@ -48,23 +57,6 @@ body {
     font-size: 24px;
     margin-top: 70px;
     margin-bottom: 20px;
-}
-
-.year-form{
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.charts-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-}
-
-.chart-wrapper {
-    flex: 1;
-    padding: 20px;
 }
 
 .content {
@@ -226,75 +218,3 @@ header {
     font-size: small;
     font-weight: 200;
 }
-
-/* ------ End of Home page styling ------ */
-
-
-
-/* ------ Dashboard page styling ------- */
-.dash-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    margin-top: 70px;
-}
-
-.dash-header h1 {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    margin-bottom: 40px;
-}
-
-.dash-main {
-    margin: 20px 20px 100px;
-   
-}
-
-.dash-main .year-form select, button{
-    
-    margin-left: 10px;
-}
-
-.dash-main button {
-    color: white;
-    background-color: #19bc00;
-    border-radius: 5px;
-    padding: 10px 20px;
-    border: none;
-    font-size: 16px;
-    font-weight: 500;
-   
-}
-
-.dash-main button:hover {
-    color: white;
-    background-color: #128300;
-   
-}
-
-.dash-main .year-form{
-   
-    margin-bottom: 30px;
-}
-
-.dash-main .charts-wrapper{
-    padding: 20px 0;
-    margin-right: 20px;
-}
-
-.dash-main .month-form{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.dash-main .month-form select, button{
-    
-    margin-left: 10px;
-}
-
-/* ------ End of Dashboard styling ------- */
