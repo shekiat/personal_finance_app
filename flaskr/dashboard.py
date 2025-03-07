@@ -54,7 +54,7 @@ def dashboard():
     months = ["January", "February", "March", "April", "May", "June", 
               "July", "August", "September", "October", "November", "December"]
     default_year = datetime.datetime.now(tz=EST).strftime('%Y')
-    years = [year for year in range(int(default_year) - 10, int(default_year) + 1)]
+    years = [year for year in range(int(default_year), int(default_year) - 11, -1)]
     total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(default_year)
     max_income_expense = max(total_expenses)
     max_income_expense = max(total_incomes) if max(total_incomes) > max_income_expense else max_income_expense
@@ -67,7 +67,7 @@ def dashboard():
     # data for pie chart
     default_month = datetime.datetime.now(tz=EST).strftime('%B')
     categories = read_categories()
-    pie_dict = read_category_totals_for_pie_graph(default_month)
+    pie_dict = read_category_totals_for_pie_graph(default_month, default_year)
 
     pie_labels = []
     pie_data = []
@@ -119,7 +119,7 @@ def dashboard_data():
 
     # get data for pie chart
     categories = read_categories()
-    pie_dict = read_category_totals_for_pie_graph(selected_month)
+    pie_dict = read_category_totals_for_pie_graph(selected_month, selected_year)
 
     pie_labels = []
     pie_data = []

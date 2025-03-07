@@ -19,6 +19,7 @@ for (let year = startYear; year <= endYear; year++) {
 
 // Displays the subcategory input field when the "Add Subcategory" button is clicked
 const dropdown = document.getElementById("categoryDropdown");
+dropdown.style.display = "block";
 const input = document.getElementById("categoryInput");
 const button = document.getElementById("toggleCategoryBtn");
 const categorySelect = document.getElementById("category-list");
@@ -36,7 +37,13 @@ document.addEventListener("click", function (e) {
             hiddenCategory.value = categoryInput.value; 
         }
     }
-
+    else if (dropdown.style.display === "block") {
+        // If the clicked element is not the category input save input to hiddenCategory
+        if (!categorySelect.contains(e.target) && !button.contains(e.target)) {
+            hiddenCategory.value = categorySelect.value; 
+        }
+    }
+    
     console.log(categorySelect.value)
     console.log(categoryInput.value)
     console.log(hiddenCategory.value)
@@ -46,6 +53,7 @@ console.log(categorySelect.value)
 console.log(categoryInput.value)
 console.log(hiddenCategory.value)
 
+// when the toggle category (dropdown/input) button is pressed, change form elements and hidden category value
 document.getElementById("toggleCategoryBtn").addEventListener("click", function() {
     console.clear()
 
@@ -71,6 +79,7 @@ document.getElementById("toggleCategoryBtn").addEventListener("click", function(
         console.log(hiddenCategory.value)
     }
 });
+
 
 
 // Swaps visibility of Add Expense and Add Income buttons/elements

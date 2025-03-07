@@ -9,6 +9,7 @@ from flask import (
 from werkzeug.exceptions import abort
 import pytz
 EST = pytz.timezone("US/Eastern")
+import math
 
 bp = Blueprint('home', __name__)
 
@@ -61,7 +62,7 @@ def home():
     # format differences for presentation
     for i in range(3):
         if total_diffs[i] < 0:
-            total_diffs[i] = "-$" + str(total_diffs[i])[1:]
+            total_diffs[i] = "-$" + str(int(total_diffs[i]))[1:]
         elif total_diffs[i] > 0:
             total_diffs[i] = "+$" + str(total_diffs[i])
 

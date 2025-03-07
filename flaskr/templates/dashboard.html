@@ -5,6 +5,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
     <title>Dashboard</title>
 </head>
 
@@ -99,7 +100,12 @@
                     scales: {
                         y: {
                             min: 0,
-                            max: maxIncomeExpense
+                            max: maxIncomeExpense,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value; // add $ to beginning of y axis labels
+                                }
+                            }
                         }
                     }
                 }
@@ -132,7 +138,32 @@
                     scales: {
                         y: {
                             min: minBalance,
-                            max: maxBalance
+                            max: maxBalance,
+                            ticks: {
+                                callback: function(value) { // add $ to beginning of y axis labels
+                                    if (value < 0) {
+                                        return '-' + '$' + Math.abs(value);
+                                    }
+                                    else {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                line: {
+                                    type: 'line',
+                                    yMin: 0,
+                                    yMax: 0,
+                                    borderColor: 'grey',
+                                    borderWidth: 0.5,
+                                    opacity: 0.1,
+                                    zIndex: -1
+                                }
+                            }
                         }
                     }
                 }
@@ -175,6 +206,15 @@
                             anchor: 'end',
                             formatter: function(value, context) {
                                 return context.chart.data.labels[context.dataIndex];
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem){
+                                    let value = tooltipItem.raw;
+                                    let formattedValue = parseFloat(value).toFixed(2);
+                                    return `$${formattedValue}`;
+                                }
                             }
                         }
                     }
