@@ -111,6 +111,8 @@ def check_and_read_month_totals(month, year, for_dashboard):
     if len(res_totals) != 0:
         total_values = res_totals[0]
 
+    total_values = [round(total, 2) for total in total_values]
+
     print(total_values)
     
     total_differences = list(total_values)
@@ -177,7 +179,7 @@ def read_month_totals_for_line_graph(year):
 
     return total_balances, total_expenses, total_incomes
 
-def read_category_totals_for_pie_graph(month, year=2025):
+def read_category_totals_for_pie_graph(month, year):
     db = get_db()
 
     res = db.execute("SELECT TRANS_CATEGORY, SUM(TRANS_AMOUNT) AS AMOUNT FROM TRANSACTIONS WHERE MONTH = ? AND YEAR = ? GROUP BY TRANS_CATEGORY", (month_to_int[month], year))
