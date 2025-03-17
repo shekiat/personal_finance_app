@@ -33,7 +33,9 @@ def home():
     if "user" not in session:
         return redirect("/cognito-login")
     else:
+        print(f"user{session['user']}")
         user_session = session["user"]
+        state_session = session['state']
     # if called through "/submit", get whether the submit was successful; if called through "/month-change", get the month and year
     session_vars = {
         # for transactions
@@ -49,11 +51,10 @@ def home():
         "chosen_month": session.get("chosen_month", datetime.datetime.now(tz=EST).month),
         "chosen_year": session.get("chosen_year", datetime.datetime.now(tz=EST).year)
     }
-    session.clear()
 
     # re-input user info to session
-    if user_session:
-        session["user"] = user_session
+    session["user"] = user_session
+    session['state'] = state_session
 
     # get the totals and transactions for current month
     trans_list = []
