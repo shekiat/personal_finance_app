@@ -33,12 +33,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: us-east-2  # Change to your AWS region if necessary
+          aws-region: us-east-2 
 
       # Step 5: Package the application
       - name: Zip the application files
         run: |
-          zip -r my-flask-app.zip .  # Adjust this if your directory structure is different
+          zip -r my-flask-app.zip .  
 
       # Step 6: Upload the ZIP to S3
       - name: Upload to S3
