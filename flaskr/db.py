@@ -108,7 +108,6 @@ def read_income(month, year):
     income_list = []
 
     for income in income_list_res:
-        print(f"income: {income}")
         income_list_element = []
         for i in range(len(income)):
             if i == 1:
@@ -143,8 +142,6 @@ def check_and_read_month_totals(month, year, for_dashboard):
         total_values = res_totals[0]
 
     total_values = [round(total, 2) for total in total_values]
-
-    print(total_values)
     
     total_differences = list(total_values)
     total_differences_percs = list(total_values)
