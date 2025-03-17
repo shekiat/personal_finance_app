@@ -57,5 +57,8 @@ def create_app(test_config=None):
         user_info = oauth.oidc.parse_id_token(token, nonce=nonce) 
         session["user"] = user_info  
         return redirect("/")  
+    
+    if __name__ == '__main__':
+       app.run(host='0.0.0.0', port=5000)
 
     return app
