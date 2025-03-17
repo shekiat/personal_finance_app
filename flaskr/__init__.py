@@ -1,11 +1,13 @@
-from flask import Flask, session, redirect
+from flask import Flask, session, redirect, url_for
 from authlib.integrations.flask_client import OAuth
 import os
+import requests
 
 def create_app(test_config=None):
     # create and configure app
     app = Flask(__name__)
-    app.config.from_object('config')
+    from . import config
+    app.config.from_object(config)
     app.secret_key = "secret key"
     oauth = OAuth(app)
 
@@ -30,23 +32,28 @@ def create_app(test_config=None):
 
     @app.route('/cognito-login')
     def login():
+      print(session.get("user", None))
       nonce = os.urandom(16).hex()
       session['nonce'] = nonce
-      return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce)
+
+      state = os.urandom(16).hex() 
+      session['state'] = state   
+      return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state)
     
-    @app.route('/logout')
+    @app.route('/cognito-logout')
     def logout():
+      print(f"session before clearing: {session}")
       session.clear()
-      
-      cognito_logout_url = 'https://127.0.0.1/logout' 
-      cognito_logout_url += f'?client_id={app.config["CLIENT_ID"]}&logout_uri=http://localhost:5000/cognito-login'
-    
-      return redirect(cognito_logout_url)  
+      print(f"session after clearing: {session}")
+      # return redirect(url_for('home.home'))
+      cognito_logout_url = f"https://cognito-idp.us-east-2.amazonaws.com/us-east-2_uiivhIHti/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000"
+      return redirect(cognito_logout_url)
     
     @app.route('/callback')
     def callback():
         token = oauth.oidc.authorize_access_token()
         nonce = session.pop('nonce')
+        print(f"nonce: {nonce}")
         user_info = oauth.oidc.parse_id_token(token, nonce=nonce) 
         session["user"] = user_info  
         return redirect("/")  
