@@ -26,8 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+        # Step 4: Install Heroku CLI
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
-      # Step 4: Deploy to Heroku
+      # Step 5: Deploy to Heroku
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
