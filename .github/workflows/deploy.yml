@@ -1,4 +1,4 @@
-name: Deploy to Elastic Beanstalk
+name: Deploy to Heroku
 
 on:
   push:
@@ -33,5 +33,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: 'money-mate'  
-          heroku_email: 'nsteiner@oakland.edu'
+          heroku_app_name: "money-mate"
+          heroku_email: "nsteiner@oakland.edu"
