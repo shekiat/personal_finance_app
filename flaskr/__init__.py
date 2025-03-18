@@ -11,6 +11,8 @@ def create_app(test_config=None):
     from . import config
     app.config.from_object(config)
     app.secret_key = "secret key"
+    port = int(os.environment.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
     oauth = OAuth(app)
 
     # set up Amazon Cognito login
