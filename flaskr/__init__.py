@@ -5,7 +5,7 @@ import requests
 
 # trigger deployment 3
 
-def create_app(test_config=None):
+def create_app(test_config=None, *args, **kwargs):
     # create and configure app
     app = Flask(__name__)
     from . import config
