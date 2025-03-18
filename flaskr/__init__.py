@@ -3,7 +3,7 @@ from authlib.integrations.flask_client import OAuth
 import os
 import requests
 
-# trigger deployment
+# trigger deployment 2
 
 def create_app(test_config=None):
     # create and configure app
