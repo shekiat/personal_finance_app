@@ -12,10 +12,7 @@ def create_app(test_config=None, *args, **kwargs):
     app.config.from_object(config)
     app.secret_key = "secret key"
     oauth = OAuth(app)
-
-    with app.app_context():
-        db.create_all()
-
+    
     # set up Amazon Cognito login
     oauth.register(
         name='oidc',
