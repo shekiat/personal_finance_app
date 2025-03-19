@@ -3,7 +3,9 @@ from authlib.integrations.flask_client import OAuth
 import os
 import requests
 
-def create_app(test_config=None):
+# trigger deployment 3
+
+def create_app(test_config=None, *args, **kwargs):
     # create and configure app
     app = Flask(__name__)
     from . import config
@@ -38,7 +40,7 @@ def create_app(test_config=None):
 
       state = os.urandom(16).hex() 
       session['state'] = state   
-      return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state)
+      return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
     
     @app.route('/cognito-logout')
     def logout():
@@ -46,7 +48,7 @@ def create_app(test_config=None):
       session.clear()
       print(f"session after clearing: {session}")
       # return redirect(url_for('home.home'))
-      cognito_logout_url = f"https://cognito-idp.us-east-2.amazonaws.com/us-east-2_uiivhIHti/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000"
+      cognito_logout_url = f"https://cognito-idp.us-east-2.amazonaws.com/us-east-2_uiivhIHti/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
       return redirect(cognito_logout_url)
     
     @app.route('/callback')
@@ -57,8 +59,5 @@ def create_app(test_config=None):
         user_info = oauth.oidc.parse_id_token(token, nonce=nonce) 
         session["user"] = user_info  
         return redirect("/")  
-    
-    if __name__ == '__main__':
-       app.run(host='0.0.0.0', port=5000)
 
     return app

@@ -36,6 +36,7 @@ def home():
         print(f"user{session['user']}")
         user_session = session["user"]
         state_session = session['state']
+
     # if called through "/submit", get whether the submit was successful; if called through "/month-change", get the month and year
     session_vars = {
         # for transactions
@@ -86,7 +87,6 @@ def home():
         chosen_month_string = int_to_month[session_vars["chosen_month"]]
         
     return render_template("home.html", trans_list=trans_list, income_list=income_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
-    
     
 @bp.route('/submit-transaction', methods=['POST'])
 def submit():
