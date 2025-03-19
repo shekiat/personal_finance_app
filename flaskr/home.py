@@ -30,12 +30,12 @@ int_to_month = {
 
 @bp.route('/')
 def home():
-    if "user" not in session:
-        return redirect("/cognito-login")
-    else:
-        print(f"user{session['user']}")
-        user_session = session["user"]
-        state_session = session['state']
+    # if "user" not in session:
+    #     return redirect("/cognito-login")
+    # else:
+    #     print(f"user{session['user']}")
+    #     user_session = session["user"]
+    #     state_session = session['state']
     # if called through "/submit", get whether the submit was successful; if called through "/month-change", get the month and year
     session_vars = {
         # for transactions
