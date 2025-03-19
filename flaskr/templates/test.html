@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneyMate - Test Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Welcome to MoneyMate App!</h1>
+        <p class="lead">This is a test page to check if the front-end and deployment are working properly (without connecting to the database).</p>
+
+        <!-- Test Button for Functionality -->
+        <button class="btn btn-primary mt-3" id="testButton">Test Button</button>
+
+        <div id="responseMessage" class="mt-3"></div>
+
+        <hr>
+
+        <footer class="mt-5">
+            <p>App hosted on <strong>Heroku</strong></p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('testButton').addEventListener('click', function() {
+            // Simulate a simple front-end action
+            document.getElementById('responseMessage').innerHTML = "<p class='text-success'>Button clicked successfully!</p>";
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

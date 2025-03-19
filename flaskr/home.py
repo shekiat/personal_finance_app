@@ -63,8 +63,8 @@ def home():
     chosen_year = session_vars['chosen_year']
 
     total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year, False) # [balance, expenses, income]
-    trans_list = read_transactions(chosen_month, chosen_year)
-    income_list = read_income(chosen_month, chosen_year)
+    # trans_list = read_transactions(chosen_month, chosen_year)
+    # income_list = read_income(chosen_month, chosen_year)
     
     # format differences for presentation
     for i in range(3):
@@ -74,7 +74,7 @@ def home():
             total_diffs[i] = "+$" + str(total_diffs[i])
 
     # get categories for drop down
-    category_list = read_categories()
+    # category_list = read_categories()
 
     # year list for drop down
     year_list = []
@@ -85,8 +85,8 @@ def home():
     if isinstance(session_vars["chosen_month"], int):
         chosen_month_string = int_to_month[session_vars["chosen_month"]]
         
-    return render_template("home.html", trans_list=trans_list, income_list=income_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
-    
+    # return render_template("home.html", trans_list=trans_list, income_list=income_list, session_vars=session_vars, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = datetime.datetime.now(tz=EST).year, chosen_month_string=chosen_month_string)
+    return render_template("test.html")
     
 @bp.route('/submit-transaction', methods=['POST'])
 def submit():
