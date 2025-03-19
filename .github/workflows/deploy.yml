@@ -1,47 +1,4 @@
-# name: Deploy to Heroku
-
-# on:
-#   push:
-#     branches:
-#       - master
-
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       # Step 1: Checkout the code
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-
-#       # Step 2: Set up Python
-#       - name: Set up Python
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: '3.12'  # You can change this to your desired version
-
-#       # Step 3: Install dependencies
-#       - name: Install dependencies
-#         run: |
-#           python -m pip install --upgrade pip
-#           pip install -r requirements.txt
-
-#         # Step 4: Install Heroku CLI
-#       - name: Install Heroku CLI
-#         run: |
-#           curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-
-#       # Step 5: Deploy to Heroku
-
-#       - name: Deploy to Heroku
-#         uses: akhileshns/heroku-deploy@v3.12.12
-#         with:
-#           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-#           heroku_app_name: "money-mate"
-#           heroku_email: "nsteiner@oakland.edu"
-
-
-name: Deploy to Elastic Beanstalk
+name: Deploy to Heroku
 
 on:
   push:
@@ -69,36 +26,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Step 4: Set up AWS CLI
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
+        # Step 4: Install Heroku CLI
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+
+      # Step 5: Deploy to Heroku
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2  # Change to your AWS region if necessary
-
-      # Step 5: Package the application
-      - name: Zip the application files
-        run: |
-          zip -r my-flask-app.zip .  
-
-      # Step 6: Upload the ZIP to S3
-      - name: Upload to S3
-        run: |
-          aws s3 cp my-flask-app.zip s3://moneymatebucket/my-flask-app.zip 
-
-      # Step 7: Create an application version
-      - name: Create Elastic Beanstalk Application Version
-        run: |
-          aws elasticbeanstalk create-application-version \
-            --application-name MoneyMate \
-            --version-label $GITHUB_SHA \
-            --source-bundle S3Bucket="moneymatebucket",S3Key="my-flask-app.zip"
-
-      # Step 8: Deploy the application version
-      - name: Deploy to Elastic Beanstalk
-        run: |
-          aws elasticbeanstalk update-environment \
-            --application-name MoneyMate \
-            --environment-name MoneyMate-env \
-            --version-label $GITHUB_SHA
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: "money-mate"
+          heroku_email: "nsteiner@oakland.edu"
