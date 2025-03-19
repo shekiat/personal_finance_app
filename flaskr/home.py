@@ -53,8 +53,8 @@ def home():
     }
 
     # re-input user info to session
-    session["user"] = user_session
-    session['state'] = state_session
+    # session["user"] = user_session
+    # session['state'] = state_session
 
     # get the totals and transactions for current month
     trans_list = []
