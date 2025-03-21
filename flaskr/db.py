@@ -228,18 +228,6 @@ def init_app(app):
     app.teardown_appcontext(close_db) # call when cleaning up after returning response
     app.cli.add_command(init_db_command)
 
-
-
-
-
-
-
-
-
-
-
-
-
 # def get_db():
 #     if 'db' not in g:
 #         g.db = psycopg2.connect(dbname='MoneyMateDB',
