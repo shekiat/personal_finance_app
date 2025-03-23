@@ -230,7 +230,7 @@ month_to_int = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, '
 
 def get_db():
     if 'db' not in g:
-        g.db = psycopg2.connect(dbname='MoneyMateDB',
+        g.db = psycopg2.connect(
             host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
             user='postgres',
             password='3v?gG:.>(4MA3s:#i?ERl0b(xMY|',
