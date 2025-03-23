@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body class="combined_budget-body">
+
+    <button id="addToBudget" >Add To Budget</button>
+    <!-- Budget Table -->
+    <section class="budget" id="budgetTable">
+        <h3>Budget Plans</h3>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Memo</th>
+                <th></th>
+
+            </tr>
+            <!--For loop for pulling transactions from db-->
+            {% for transaction in trans_list %}
+            <tr>
+                <td>Jim Gorden</td>
+                <!--format date-->
+                {% if transaction[3][5] == "1" %}
+                    <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                {% else %}
+                    <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                {% endif %}
+                <!--add zero to end of amount if it should end in one-->
+                {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
+                    <td>${{transaction[1]}}0</td>
+                {% else %}
+                    <td>${{transaction[1]}}</td>
+                {% endif %}
+                <td>{{transaction[2].title()}}</td>
+                <td>{{transaction[4]}}</td>
+
+                <!--delete transaction-->
+                <td>
+                    <form action="/delete-transaction" method="post">
+                        <input type="hidden" name="transaction_id" value="{{ transaction[0] }}">
+                        <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
+                        <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+</body>
+</html>
