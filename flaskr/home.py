@@ -63,7 +63,26 @@ def home():
     chosen_month = session_vars['chosen_month']
     chosen_year = session_vars['chosen_year']
 
-    total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year, False) # [balance, expenses, income]
+    # total_values, total_diffs, total_diff_percs = check_and_read_month_totals(chosen_month, chosen_year, False) # [balance, expenses, income]
+    
+    # total values current month = check_and_read(this month, year)
+    # total values past month = check_and_read(this month - 1, year - 1)
+    # calculate diffs and diff percs here
+
+    # fetch current and past month totals
+    total_values = read_month_totals(chosen_month, chosen_year)
+    print(f"total values: {total_values}")
+    past_month_total_values = read_month_totals(chosen_month - 1, chosen_year - 1)
+    
+    # calculate differences, percent differences
+    total_diffs = [0, 0, 0]
+    total_diff_percs = list(total_values)
+    if past_month_total_values != [0, 0, 0]:
+        total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
+        for i in range(3):
+            if past_month_total_values[i] != 0:
+                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+
     trans_list = read_transactions(chosen_month, chosen_year)
     income_list = read_income(chosen_month, chosen_year)
     

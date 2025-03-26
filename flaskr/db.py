@@ -233,7 +233,7 @@ def get_db():
         g.db = psycopg2.connect(
             host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
             user='postgres',
-            password='3v?gG:.>(4MA3s:#i?ERl0b(xMY|',
+            password='pGO?ZM!W<P5MzNdkPcnFCrqM(6#o',
             database='MoneyMateDB',
             port='5432'
         )
@@ -394,11 +394,12 @@ def check_and_read_month_totals(month, year, for_dashboard):
 
     return total_values, total_differences, total_differences_percs
 
+
 def update_totals(month=None, year=None):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    if [month, year] != [None, None]: # = [None, None] if we are not adding a transaction
+    if [month, year] != [None, None]: # = [None, None] if we are deleting transaction
         db_cursor.execute("SELECT * FROM TOTALS_PER_MONTH WHERE MONTH = %s AND YEAR = %s", (month, year))
         if len(db_cursor.fetchall()) == 0: 
             db_cursor.execute("INSERT INTO TOTALS_PER_MONTH VALUES(%s, %s, 0, 0)", (month, year))
@@ -413,6 +414,23 @@ def update_totals(month=None, year=None):
     db.commit()
     db_cursor.close()
 
+def read_month_totals(month, year):
+    db = get_db()
+    db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s", (month, year))
+    expense_total = float(db_cursor.fetchone())
+
+    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s", (month, year))
+    income_total = float(db_cursor.fetchall()[0][0])
+
+    balance_total = income_total - expense_total
+
+    return balance_total, expense_total, income_total
+
+
+
+# categories 
 def read_categories():
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
