@@ -169,6 +169,31 @@ window.addEventListener("beforeunload", () => {
     localStorage.setItem("scrollPosition", window.scrollY);
 });
 
+// Invite form submission handler for Combined Budget page
+document.getElementById("budgetForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = document.getElementById("email").value;
+
+    try {
+        const response = await fetch("/invite", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+});
+
 window.addEventListener("load", () => {
     let scrollPosition = localStorage.getItem("scrollPosition");
     if (scrollPosition) {

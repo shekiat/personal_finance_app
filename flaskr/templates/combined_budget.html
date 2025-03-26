@@ -7,7 +7,16 @@
 </head>
 <body class="combined_budget-body">
 
-    <button id="addToBudget" >Add To Budget</button>
+    <section id="budgetForm"> 
+        <button id="addToBudget" >Add To Budget</button>
+
+        <form id="inviteForm">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Send Invitation</button>
+        </form>
+    </section>
+    
     <!-- Budget Table -->
     <section class="budget" id="budgetTable">
         <h3>Budget Plans</h3>
@@ -21,25 +30,10 @@
                 <th></th>
 
             </tr>
-            <!--For loop for pulling transactions from db-->
-            {% for transaction in trans_list %}
-            <tr>
-                <td>Jim Gorden</td>
-                <!--format date-->
-                {% if transaction[3][5] == "1" %}
-                    <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
-                {% else %}
-                    <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
-                {% endif %}
-                <!--add zero to end of amount if it should end in one-->
-                {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
-                    <td>${{transaction[1]}}0</td>
-                {% else %}
-                    <td>${{transaction[1]}}</td>
-                {% endif %}
-                <td>{{transaction[2].title()}}</td>
-                <td>{{transaction[4]}}</td>
-
+            
+            
+            <!--For loop for pulling budget plan info from db-->
+            
                 <!--delete transaction-->
                 <td>
                     <form action="/delete-transaction" method="post">
