@@ -44,14 +44,14 @@ def create_app(test_config=None, *args, **kwargs):
 
       state = os.urandom(16).hex() 
       session['state'] = state
-      return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
-      # return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state, prompt='login')
+      # return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
+      return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state, prompt='login')
 
     @app.route('/cognito-logout')
     def logout():
       session.clear()
-      cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
-      # cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000/"
+      # cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
+      cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000/"
       return redirect(cognito_logout_url)
     
     @app.route('/callback')
