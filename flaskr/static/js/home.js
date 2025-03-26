@@ -43,6 +43,12 @@ document.addEventListener("click", function (e) {
             hiddenCategory.value = categorySelect.value; 
         }
     }
+    else {
+        // if clicked button is not the submit transaction/income button, remove transaction/income added/error message
+        if (!categorySelect.contains(e.target) && !button.contains(e.target)) {
+            hiddenCategory.value = categorySelect.value; 
+        }
+    }
     
     console.log(categorySelect.value)
     console.log(categoryInput.value)

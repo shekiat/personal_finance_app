@@ -71,17 +71,16 @@ def home():
 
     # fetch current and past month totals
     total_values = read_month_totals(chosen_month, chosen_year)
-    print(f"total values: {total_values}")
     past_month_total_values = read_month_totals(chosen_month - 1, chosen_year - 1)
-    
     # calculate differences, percent differences
     total_diffs = [0, 0, 0]
-    total_diff_percs = list(total_values)
-    if past_month_total_values != [0, 0, 0]:
+    total_diff_percs = [0, 0, 0]
+    if past_month_total_values != (0, 0, 0):
         total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
         for i in range(3):
             if past_month_total_values[i] != 0:
                 total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+
 
     trans_list = read_transactions(chosen_month, chosen_year)
     income_list = read_income(chosen_month, chosen_year)
@@ -130,7 +129,6 @@ def submit():
 
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
             write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo)
-            update_totals(parsed_date_full.month, parsed_date_full.year)
             session['submit_successful'] = True
         else:
             # if the date is in the future, notify user, add info to session so it stays in the input boxes
@@ -176,7 +174,6 @@ def submit_inc():
         float(amount)
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
             write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo)
-            update_totals(parsed_date_full.month, parsed_date_full.year)
             session['submit_successful'] = True
         else:
             # if the date is in the future, notify user, add info to session so it stays in the input boxes
@@ -222,7 +219,6 @@ def delete():
     session['chosen_year'] = int(request.form['year'])
 
     delete_transaction(transaction_id)
-    update_totals()
 
     # Feedback that transaction has been deleted?
 
@@ -237,7 +233,6 @@ def delete_inc():
     session['expense_income'] = 1
 
     delete_income(income_id)
-    update_totals()
 
     # Feedback that transaction has been deleted?
 
