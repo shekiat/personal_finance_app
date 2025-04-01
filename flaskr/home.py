@@ -284,21 +284,6 @@ int_to_month = {
 def home():
     if "user" not in session:
         return redirect("/cognito-login")
-    
-    session_vars = {
-        # for transactions
-        "submit_successful": session.get("submit_successful", None),
-        "unsuccessful_reason": session.get("unsuccessful_reason", -1),
-        "session_amount": session.get("amount", None),
-        "session_date": session.get("date", None),
-        "session_category": session.get("category", None),
-        "session_memo": session.get("memo", ''),
-        "expense_income": session.get("expense_income", 0),
-
-        # for totals
-        "chosen_month": session.get("chosen_month", datetime.datetime.now(tz=EST).month),
-        "chosen_year": session.get("chosen_year", datetime.datetime.now(tz=EST).year)
-    }
 
     # get the totals and transactions for current month
     trans_list = []
@@ -341,7 +326,7 @@ def home():
     if isinstance(session['current_month'], int):
         current_month_string = int_to_month[session['current_month']]
         
-    return render_template("home.html", session_vars=session_vars, trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = session['current_year'], current_month=session["current_month"], current_month_string=current_month_string)
+    return render_template("home.html", trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = session['current_year'], current_month=session["current_month"], current_month_string=current_month_string)
     
 @bp.route('/api/submit-transaction', methods=['POST'])
 def submit():

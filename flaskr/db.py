@@ -436,7 +436,7 @@ def read_month_totals(month, year, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
+    db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id[0]))
     expense_row = db_cursor.fetchone()[0]
     if expense_row != None:
         expense_total = float(expense_row)
