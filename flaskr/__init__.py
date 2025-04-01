@@ -34,11 +34,11 @@ def create_app(test_config=None, *args, **kwargs):
     app.register_blueprint(comb_budget.bp)
 
     from . import db
+    from .db import fetch_user_id
     db.init_app(app)
 
     @app.route('/cognito-login')
     def login():
-      print(session.get("user", None))
       nonce = os.urandom(16).hex()
       session['nonce'] = nonce
 
@@ -60,6 +60,10 @@ def create_app(test_config=None, *args, **kwargs):
         nonce = session.pop('nonce')
         user_info = oauth.oidc.parse_id_token(token, nonce=nonce) 
         session["user"] = user_info  
+        # fetch user id from db
+        session["user_id"] = fetch_user_id(session["user"]["email"])
+        print(f"email: {session['user']['email']}")
+        print(f"user id: {session['user_id']}")
         return redirect("/")  
 
     return app

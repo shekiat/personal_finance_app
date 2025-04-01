@@ -49,6 +49,8 @@ document.addEventListener("click", function (e) {
             hiddenCategory.value = categorySelect.value; 
         }
     }
+
+    document.getElementById("transactionFeedbackMessage").innerText = "";
     
     console.log(categorySelect.value)
     console.log(categoryInput.value)
@@ -104,15 +106,6 @@ const incomeSuccessMessage = document.getElementById("incomeSuccessMessage");
 const failDateMessage = document.getElementById("failDateMessage");
 const failAmountMessage = document.getElementById("failAmountMessage");
 
-if (expense_income == 0) {
-    addExpense.style.display = "none";
-    incomeForm.style.display = "none";
-    incomeTable.style.display = "none";
-} else {
-    addIncome.style.display = "none";
-    transactionForm.style.display = "none";
-    transactionTable.style.display = "none";
-}
 
 addIncome.addEventListener("click", function() {
     expense_income = 1;
@@ -120,8 +113,9 @@ addIncome.addEventListener("click", function() {
     transactionForm.style.display = "none";
     incomeForm.style.display = "block";
 
-    addExpense.style.display = "block"
-    addIncome.style.display = "none"
+    addExpense.style.display = "block";
+    addIncome.style.display = "none";
+    addExpense.style.justifyContent = "center";
 
     transactionTable.style.display = "none";
     incomeTable.style.display = "block";
@@ -139,6 +133,7 @@ addExpense.addEventListener("click", function() {
 
     addExpense.style.display = "none";
     addIncome.style.display = "block";
+    addIncome.style.justifyContent = "center";
 
     transactionTable.style.display = "block";
     incomeTable.style.display = "none";
@@ -170,39 +165,158 @@ function showFailDateMessage() {
 }
 
 
-// keep track of where user scrolled to
-window.addEventListener("beforeunload", () => {
-    localStorage.setItem("scrollPosition", window.scrollY);
-});
 
-// Invite form submission handler for Combined Budget page
-document.getElementById("budgetForm").addEventListener("submit", async (event) => {
+
+// button listeners for jsonify
+attachDeleteListeners()
+// submit transaction
+const submitTransBtn = document.getElementById("submitTransBtn");
+submitTransBtn.addEventListener("click", function() {
     event.preventDefault();
-    const email = document.getElementById("email").value;
+    console.log("submit transaction button hit")
+    const formData = {
+        amount: document.getElementById("transAmount").value,
+        date: document.getElementById("transDate").value,
+        memo: document.getElementById("transMemo").value,
+        category: document.getElementById("hidden-category").value
+    };
 
-    try {
-        const response = await fetch("/invite", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email }),
+    fetch("/api/submit-transaction", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("transaction added succesfully")
+                document.getElementById("transactionFeedbackMessage").innerText = "Transaction added!";
+                document.getElementById("transAmount").value = "",
+                document.getElementById("transDate").value = "",
+                document.getElementById("transMemo").value = "",
+                document.getElementById("hidden-category").value = ""
+                // hide category inpiut, display dropdown
+
+                updateStats();
+                fetchUpdatedTransactions();
+            }
+            else {
+                //assign each form input to the value of data.amount, data.date, etc.
+                document.getElementById("transAmount").value = data.amount,
+                document.getElementById("transDate").value = data.date,
+                document.getElementById("transMemo").value = data.memo
+                //document.getElementById("hidden-category").value = data.category
+                if (data.return_value === 1) {
+                    document.getElementById("transactionFeedbackMessage").innerText = "Date is in the future!";
+                }
+                else {
+                    document.getElementById("transactionFeedbackMessage").innerText = "Amount is not a number!";
+                }
+            }
+        })
+});
+
+// update transaction table
+function updateTransactionTable(transactions) {
+    const tableBody = document.querySelector("#transactionTable table");
+
+    tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
+
+    transactions.forEach(transaction => {
+        const formattedDate = formatDate(transaction[3]);
+        const formattedAmount = formatAmount(transaction[1]);
+        const capitalizedCategory = transaction[2].charAt(0).toUpperCase() + transaction[2].slice(1);
+
+        const row = `
+            <tr>
+                <td>Jim Gorden</td>
+                <td>${formattedDate}</td>
+                <td>${formattedAmount}</td>
+                <td>${capitalizedCategory}</td>
+                <td>${transaction[4]}</td>
+                <td>
+                    <button 
+                        class="delete-trans-btn" 
+                        transaction-id="${transaction[0]}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+
+    attachDeleteListeners();
+}
+function formatDate(date) {
+    return date[5] === "1"
+        ? `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`
+        : `${date.slice(6, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
+}
+function formatAmount(amount) {
+    const strAmount = amount.toString();
+    return strAmount.includes(".") && strAmount.split(".")[1].length === 1
+        ? `$${strAmount}0`
+        : `$${strAmount}`;
+}
+
+function fetchUpdatedTransactions() {
+    fetch("/api/update-transaction-table")
+        .then(response => response.json())
+        .then(data => {
+            updateTransactionTable(data.transactions);
         });
+}
 
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message);
-        } else {
-            alert(`Error: ${result.error}`);
-        }
-    } catch (error) {
-        alert(`Error: ${error.message}`);
-    }
+// attach delete listeners on table entries
+function attachDeleteListeners() {
+    document.querySelectorAll('.delete-trans-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log("delete button hit");
+            const transactionId = event.target.getAttribute('transaction-id');
+            fetch('/api/delete-transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    transaction_id: transactionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    event.target.closest('tr').remove();
+                    updateStats();
+                }
+            });
+        });
+    });
+}
+
+
+
+
+
+
+// change date
+const submitDateBtn = document.getElementById("submitDateBtn");
+submitDateBtn.addEventListener("click", function() {
+    const formData = {
+        month: document.getElementById("month").value,
+        year: document.getElementById("year").value
+    };
+
+    fetch("/api/submit-date", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    });
+
+    updateStats()
 });
 
-window.addEventListener("load", () => {
-    let scrollPosition = localStorage.getItem("scrollPosition");
-    if (scrollPosition) {
-        window.scrollTo(0, parseInt(scrollPosition));
-    }
-});

@@ -233,7 +233,7 @@ def get_db():
         g.db = psycopg2.connect(
             host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
             user='postgres',
-            password='pGO?ZM!W<P5MzNdkPcnFCrqM(6#o',
+            password='D$0?#oh4h.$3D?|L]w6bZ#UICbU1',
             database='MoneyMateDB',
             port='5432'
         )
@@ -251,11 +251,27 @@ def parse_date(date):
             return parse(date)
         except ValueError:
             return None  # Return None if the input is not a valid date
+        
+def fetch_user_id(user_email):
+    db = get_db()
+    db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    db_cursor.execute("SELECT USER_ID FROM USERS WHERE EMAIL = %s", (user_email,))
+    user_id_row = db_cursor.fetchall()
+    if len(user_id_row) == 0:
+        db_cursor.execute("SELECT MAX(USER_ID) FROM USERS")
+        user_id = db_cursor.fetchall()[0][0] + 1
+        db_cursor.execute("INSERT INTO USERS VALUES (%s, %s)", (user_id, user_email)) # create user in USERS
+        db.commit()
+    else:
+        user_id = user_id_row[0]
+    db_cursor.close()
+
+    return user_id
 
 
 
 # transactions
-def write_transaction(user, amount, date, category, memo):
+def write_transaction(user, amount, date, category, memo, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     db_cursor.execute("SELECT MAX(TRANS_ID) FROM TRANSACTIONS")
@@ -271,15 +287,17 @@ def write_transaction(user, amount, date, category, memo):
     if str(amount)[0] == '$':
         amount = int(str(amount)[1:])
 
-    data = (new_id, amount, category.title(), date, memo if memo else '')
-    db_cursor.execute(f"INSERT INTO TRANSACTIONS VALUES(%s, %s, %s, %s, %s)", data)
+    data = (new_id, amount, category.title(), date, memo if memo else '', user_id)
+    print(user_id)
+    db_cursor.execute(f"INSERT INTO TRANSACTIONS (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO, USER_ID) VALUES(%s, %s, %s, %s, %s, %s)", data)
     db.commit()
     db_cursor.close()
 
-def read_transactions(month, year):
+def read_transactions(month, year, user_id):
+    print(f"user id: {user_id}")
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    db_cursor.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s ORDER BY TRANS_DATE DESC", (month, year)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
+    db_cursor.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY TRANS_DATE DESC", (month, year, user_id)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
     trans_list_res = db_cursor.fetchall()
     trans_list = []
 
@@ -296,7 +314,7 @@ def read_transactions(month, year):
 
     return trans_list
 
-def delete_transaction(trans_id):
+def delete_transaction(trans_id, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     db_cursor.execute("DELETE FROM TRANSACTIONS WHERE TRANS_ID = %s", (trans_id,))
@@ -306,7 +324,7 @@ def delete_transaction(trans_id):
 
 
 # income
-def write_income(user, amount, date, memo):
+def write_income(user, amount, date, memo, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     db_cursor.execute("SELECT MAX(INCOME_ID) FROM INCOME")
@@ -322,21 +340,21 @@ def write_income(user, amount, date, memo):
     if str(amount)[0] == '$':
         amount = int(str(amount)[1:])
 
-    data = (new_id, amount, date, memo if memo else '')
-    db_cursor.execute(f"INSERT INTO INCOME VALUES(%s, %s, %s, %s)", data)
+    data = (new_id, amount, date, memo if memo else '', user_id)
+    db_cursor.execute(f"INSERT INTO INCOME VALUES(%s, %s, %s, %s, %s)", data)
     db.commit()
     db_cursor.close()
 
-def read_income(month, year):
+def read_income(month, year, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    db_cursor.execute("SELECT * FROM INCOME WHERE MONTH = %s AND YEAR = %s ORDER BY INCOME_DATE DESC", (month, year)) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
+    db_cursor.execute("SELECT * FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY INCOME_DATE DESC", (month, year, user_id)) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
     income_list_res = db_cursor.fetchall()
     income_list = []
 
     for income in income_list_res:
         income_list_element = []
-        for i in range(len(income)):
+        for i in range(len(income), user_id):
             if i == 1:
                 income_list_element.append(float(income[i]))
             elif i == 2:
@@ -347,7 +365,7 @@ def read_income(month, year):
 
     return income_list
 
-def delete_income(income_id):
+def delete_income(income_id, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     db_cursor.execute("DELETE FROM INCOME WHERE INCOME_ID = %s", (income_id,))
@@ -358,7 +376,7 @@ def delete_income(income_id):
 
 # totals
 # once a new month is picked, check if it exists in the TOTALS_PER_MONTH table
-# def check_and_read_month_totals(month, year, for_dashboard):
+# def check_and_read_month_totals(month, year, for_dashboard, user_id):
 #     db = get_db()
 #     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 #     # get information from current month
@@ -386,7 +404,7 @@ def delete_income(income_id):
 #         if len(res_totals) != 0 and res_totals[0][2] is not None:
 #             past_month_values = res_totals[0]
 #             total_differences = [round(x - y, 2) for x, y in zip(total_differences, past_month_values)]
-#             for i in range(3):
+#             for i in range(3, user_id):
 #                 if past_month_values[i] != 0:
 #                     total_differences_percs[i] = round(total_differences_percs[i] / past_month_values[i] * 100 - 100, 2)
 #         else:
@@ -395,7 +413,7 @@ def delete_income(income_id):
 #     return total_values, total_differences, total_differences_percs
 
 
-# def update_totals(month=None, year=None):
+# def update_totals(month=None, year=None, user_id):
 #     db = get_db()
 #     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -414,18 +432,18 @@ def delete_income(income_id):
 #     db.commit()
 #     db_cursor.close()
 
-def read_month_totals(month, year):
+def read_month_totals(month, year, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s", (month, year))
+    db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
     expense_row = db_cursor.fetchone()[0]
     if expense_row != None:
         expense_total = float(expense_row)
     else: 
         expense_total = 0
 
-    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s", (month, year))
+    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
     income_row = db_cursor.fetchone()[0]
     if  income_row != None:
         income_total = float(income_row)
@@ -439,11 +457,11 @@ def read_month_totals(month, year):
 
 
 # categories 
-def read_categories():
+def read_categories(user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    db_cursor.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS ORDER BY TRANS_CATEGORY")
+    db_cursor.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS WHERE USER_ID = %s ORDER BY TRANS_CATEGORY", (user_id,))
     categories = [row[0] for row in db_cursor.fetchall()]
 
     return categories
@@ -451,7 +469,7 @@ def read_categories():
 
 
 # dashboard
-def read_month_totals_for_line_graph(year):
+def read_month_totals_for_line_graph(year, user_id):
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
     total_balances = []
@@ -459,18 +477,18 @@ def read_month_totals_for_line_graph(year):
     total_incomes = []
 
     for month in months:
-        total_values = read_month_totals(months.index(month) + 1, year)
+        total_values = read_month_totals(months.index(month) + 1, year, user_id)
         total_balances.append(total_values[0])
         total_expenses.append(total_values[1])
         total_incomes.append(total_values[2])
 
     return total_balances, total_expenses, total_incomes
 
-def read_category_totals_for_pie_graph(month, year):
+def read_category_totals_for_pie_graph(month, year, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    db_cursor.execute("SELECT TRANS_CATEGORY, SUM(TRANS_AMOUNT) AS AMOUNT FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s GROUP BY TRANS_CATEGORY", (month_to_int[month], year))
+    db_cursor.execute("SELECT TRANS_CATEGORY, SUM(TRANS_AMOUNT) AS AMOUNT FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s GROUP BY TRANS_CATEGORY", (month_to_int[month], year, user_id))
     categories_totals = db_cursor.fetchall()
     pie_dict = {}
     for i in range(len(categories_totals)):
@@ -479,6 +497,25 @@ def read_category_totals_for_pie_graph(month, year):
     return pie_dict
 
 
+
+# group budget function
+def add_user_to_group(creator_id, new_user_id):
+    db = get_db()
+    db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    db_cursor.execute("SELECT GROUP_ID FROM USER_GROUPS WHERE USER_1_ID = %s", creator_id)
+    group_id_row = db_cursor.fetchall()
+    if len(group_id_row) == 0:
+        db_cursor.execute("SELECT MAX(group_ID) FROM USER_GROUPS")
+        group_id = db_cursor.fetchall()[0][0] + 1
+        db_cursor.execute("INSERT INTO USER_GROUPS (GROUP_ID, USER_1_ID, USER_2_ID) VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id, new_user_id))
+    else:
+        for i in range(3, 6):
+            if group_id_row[0][i] == 0:
+                new_user_number = f"USER_{i}_ID"
+                db_cursor.execute(f"INSERT INTO USER_GROUPS ({new_user_number}) VALUES (%s) WHERE GROUP_ID = %s", (new_user_id, group_id))
+    
+    db.commit()
 
 
 def init_db():
