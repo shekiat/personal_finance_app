@@ -28,7 +28,6 @@
                                 var chosen_year = {{ current_year }}
                             </script>
                         
-                            <!--pass in {{ session_vars['chosen_month'] }} and {{ session_vars['chosen_year'] }} for month and year chosen-->
                             <label for="month">Month:</label>
                             <select id="month" name="month">
                                 <option value="January" {% if current_month == 1 %}selected{% endif %}>January</option>
