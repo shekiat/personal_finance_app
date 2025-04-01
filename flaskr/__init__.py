@@ -34,24 +34,24 @@ def create_app(test_config=None, *args, **kwargs):
     app.register_blueprint(comb_budget.bp)
 
     from . import db
+    from .db import fetch_user_id
     db.init_app(app)
 
     @app.route('/cognito-login')
     def login():
-      print(session.get("user", None))
       nonce = os.urandom(16).hex()
       session['nonce'] = nonce
 
       state = os.urandom(16).hex() 
       session['state'] = state
-      return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
-      # return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state, prompt='login')
+      # return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
+      return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state, prompt='login')
 
     @app.route('/cognito-logout')
     def logout():
       session.clear()
-      cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
-      # cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000/"
+      # cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
+      cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000/"
       return redirect(cognito_logout_url)
     
     @app.route('/callback')
@@ -60,6 +60,10 @@ def create_app(test_config=None, *args, **kwargs):
         nonce = session.pop('nonce')
         user_info = oauth.oidc.parse_id_token(token, nonce=nonce) 
         session["user"] = user_info  
+        # fetch user id from db
+        session["user_id"] = fetch_user_id(session["user"]["email"])
+        print(f"email: {session['user']['email']}")
+        print(f"user id: {session['user_id']}")
         return redirect("/")  
 
     return app

@@ -55,7 +55,7 @@ def dashboard():
               "July", "August", "September", "October", "November", "December"]
     default_year = datetime.datetime.now(tz=EST).strftime('%Y')
     years = [year for year in range(int(default_year), int(default_year) - 11, -1)]
-    total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(default_year)
+    total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(default_year, session["user_id"])
     max_income_expense = max(total_expenses)
     max_income_expense = max(total_incomes) if max(total_incomes) > max_income_expense else max_income_expense
     max_income_expense = 500 * (math.ceil(max_income_expense / 500))
@@ -66,8 +66,8 @@ def dashboard():
   
     # data for pie chart
     default_month = datetime.datetime.now(tz=EST).strftime('%B')
-    categories = read_categories()
-    pie_dict = read_category_totals_for_pie_graph(default_month, default_year)
+    categories = read_categories(session["user_id"])
+    pie_dict = read_category_totals_for_pie_graph(default_month, default_year, session["user_id"])
 
     pie_labels = []
     pie_data = []
@@ -108,7 +108,7 @@ def dashboard_data():
     # get data for line graph
     months = ["January", "February", "March", "April", "May", "June", 
               "July", "August", "September", "October", "November", "December"]
-    total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(selected_year)
+    total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(selected_year, session["user"]["email"])
     max_income_expense = max(total_expenses)
     max_income_expense = max(total_incomes) if max(total_incomes) > max_income_expense else max_income_expense
     max_income_expense = 500 * (math.ceil(max_income_expense / 500))
@@ -118,8 +118,8 @@ def dashboard_data():
     min_balance = 500 * (math.floor(min_balance / 500))
 
     # get data for pie chart
-    categories = read_categories()
-    pie_dict = read_category_totals_for_pie_graph(selected_month, selected_year)
+    categories = read_categories(session["user_id"])
+    pie_dict = read_category_totals_for_pie_graph(selected_month, selected_year, session["user_id"])
 
     pie_labels = []
     pie_data = []

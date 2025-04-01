@@ -120,6 +120,10 @@ header {
    
 }
 
+.addIncomeExpense{
+    justify-content: center;
+}
+
 .home button:hover {
     color: white;
     background-color: #128300;
