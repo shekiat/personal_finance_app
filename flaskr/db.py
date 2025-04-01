@@ -297,7 +297,7 @@ def read_transactions(month, year, user_id):
     print(f"user id: {user_id}")
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    db_cursor.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY TRANS_DATE DESC", (month, year, user_id)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
+    db_cursor.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY TRANS_DATE DESC", (month, year, user_id[0])) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
     trans_list_res = db_cursor.fetchall()
     trans_list = []
 
@@ -348,7 +348,7 @@ def write_income(user, amount, date, memo, user_id):
 def read_income(month, year, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    db_cursor.execute("SELECT * FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY INCOME_DATE DESC", (month, year, user_id)) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
+    db_cursor.execute("SELECT * FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY INCOME_DATE DESC", (month, year, user_id[0])) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
     income_list_res = db_cursor.fetchall()
     income_list = []
 
@@ -443,7 +443,7 @@ def read_month_totals(month, year, user_id):
     else: 
         expense_total = 0
 
-    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
+    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id[0]))
     income_row = db_cursor.fetchone()[0]
     if  income_row != None:
         income_total = float(income_row)
@@ -461,7 +461,7 @@ def read_categories(user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    db_cursor.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS WHERE USER_ID = %s ORDER BY TRANS_CATEGORY", (user_id,))
+    db_cursor.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS WHERE USER_ID = %s ORDER BY TRANS_CATEGORY", (user_id[0],))
     categories = [row[0] for row in db_cursor.fetchall()]
 
     return categories
@@ -488,7 +488,7 @@ def read_category_totals_for_pie_graph(month, year, user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-    db_cursor.execute("SELECT TRANS_CATEGORY, SUM(TRANS_AMOUNT) AS AMOUNT FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s GROUP BY TRANS_CATEGORY", (month_to_int[month], year, user_id))
+    db_cursor.execute("SELECT TRANS_CATEGORY, SUM(TRANS_AMOUNT) AS AMOUNT FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s GROUP BY TRANS_CATEGORY", (month_to_int[month], year, user_id[0]))
     categories_totals = db_cursor.fetchall()
     pie_dict = {}
     for i in range(len(categories_totals)):
