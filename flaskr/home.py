@@ -493,10 +493,10 @@ def update_stats_and_totals():
 @bp.route("/api/update-transaction-table")
 def update_transaction_table():
     print(f"updating transaction")
-    trans_list = read_transactions(session["current_month"], session["current_year"])
+    trans_list = read_transactions(session["current_month"], session["current_year"], session["user_id"])
     return trans_list
 
 @bp.route("/api/update-income-table")
 def update_income_table():
-    income_list = read_income(session["current_month"], session["current_year"])
+    income_list = read_income(session["current_month"], session["current_year"], session["user_id"])
     return income_list

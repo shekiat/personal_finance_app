@@ -220,6 +220,7 @@ submitTransBtn.addEventListener("click", function() {
 
 // update transaction table
 function updateTransactionTable(transactions) {
+    console.log("updating transactions");
     const tableBody = document.querySelector("#transactionTable table");
 
     tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
@@ -263,9 +264,11 @@ function formatAmount(amount) {
 }
 
 function fetchUpdatedTransactions() {
+    console.log("fetching updated transactions")
     fetch("/api/update-transaction-table")
         .then(response => response.json())
         .then(data => {
+            console.log(data.transactions);
             updateTransactionTable(data.transactions);
         });
 }
@@ -320,3 +323,49 @@ submitDateBtn.addEventListener("click", function() {
     updateStats()
 });
 
+
+
+
+
+
+// update stats
+function updateStats() {
+    console.log("updating stats and table")
+    fetch("/api/update-stats", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})  
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+    })
+    .then(data => {
+        updateStatBox(".stats .stat-box:nth-child(1)", data.total_values[0], data.total_diffs[0], data.total_diff_percs[0]);
+        updateStatBox(".stats .stat-box:nth-child(2)", data.total_values[1], data.total_diffs[1], data.total_diff_percs[1]);
+        updateStatBox(".stats .stat-box:nth-child(3)", data.total_values[2], data.total_diffs[2], data.total_diff_percs[2]);
+    })
+}
+
+function updateStatBox(selector, value, diff, diffPerc) {
+    const box = document.querySelector(selector);
+
+    const formattedValue = (Number.isInteger(value))
+        ? `$${value}.00`
+        : (value.toString().includes('.') && value.toString().split('.')[1].length === 1)
+            ? `$${value}0`
+            : `$${value}`;
+
+    box.querySelector("p:nth-of-type(1)").innerHTML = formattedValue;
+
+    if (diff !== 0) {
+        const formattedDiff = (diff.toString().includes('.') && diff.toString().split('.')[1].length === 1)
+            ? `${diff}0` : diff;
+        box.querySelector("p:nth-of-type(2)").innerHTML = `${formattedDiff} (${diffPerc}%)`;
+    } else {
+        box.querySelector("p:nth-of-type(2)").innerHTML = "-";
+    }
+}
