@@ -229,12 +229,20 @@ month_to_int = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, '
 #     app.cli.add_command(init_db_command)
 
 def get_db():
+    # if 'db' not in g:
+    #     g.db = psycopg2.connect(
+    #         host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
+    #         user='postgres',
+    #         password='D$0?#oh4h.$3D?|L]w6bZ#UICbU1',
+    #         database='MoneyMateDB',
+    #         port='5432'
+    #     )
+
     if 'db' not in g:
         g.db = psycopg2.connect(
-            host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
-            user='postgres',
-            password='D$0?#oh4h.$3D?|L]w6bZ#UICbU1',
-            database='MoneyMateDB',
+            host='localhost',
+            user='nsteiner25',
+            database='awsBackup',
             port='5432'
         )
         
@@ -287,7 +295,7 @@ def write_transaction(user, amount, date, category, memo, user_id):
     if str(amount)[0] == '$':
         amount = int(str(amount)[1:])
 
-    data = (new_id, amount, category.title(), date, memo if memo else '', user_id)
+    data = (new_id, amount, category.title(), date, memo if memo else '', user_id[0])
     print(user_id)
     db_cursor.execute(f"INSERT INTO TRANSACTIONS (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO, USER_ID) VALUES(%s, %s, %s, %s, %s, %s)", data)
     db.commit()
