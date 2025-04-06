@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+
+
+
+{% block content %}
 <body class="combined_budget-body">
 
     <section id="budgetForm"> 
-        <button id="addToBudget" >Add To Budget</button>
 
         <form id="inviteForm">
             <label for="email">Email:</label>
@@ -34,21 +30,14 @@
             
             <!--For loop for pulling budget plan info from db-->
             
-                <!--delete transaction-->
-                <td>
-                    <form action="/delete-transaction" method="post">
-                        <input type="hidden" name="transaction_id" value="{{ transaction[0] }}">
-                        <input type="hidden" name="month" value="{{ session_vars['chosen_month'] }}">
-                        <input type="hidden" name="year" value="{{ session_vars['chosen_year'] }}">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
+             
 
             </tr>
-            {% endfor %}
+            
         </table>
     </section>
 
     <script src= "../static/js/comb_budget.js"> </script>
 </body>
 </html>
+{% endblock %}
