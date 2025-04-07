@@ -1,4 +1,4 @@
-import sqlite3, boto3, os, json, requests
+import sqlite3, boto3, os, json, requests, uuid
 from .db import *
 import datetime
 from datetime import timezone
@@ -11,6 +11,9 @@ import pytz
 EST = pytz.timezone("US/Eastern")
 import math
 
+# Testing AWS credentials
+from botocore.exceptions import NoCredentialsError
+import botocore.session
 
 bp = Blueprint('combined_budget', __name__)
 
@@ -50,18 +53,23 @@ def invite_user():
             send_email(email, link_only=True)  # Send email with link only
             return jsonify({'message': 'User already exists. Email sent with link only.'}), 200     
         else:
+            # Generate a unique username (UUID)
+            temp_username = f"user_{uuid.uuid4().hex[:8]}"  # Generate a short unique username
+            temp_password = 'TemporaryPassword123!'  # Define a temporary password
+
             # Create temporary user in Cognito and send invite
             cognito_client.admin_create_user(
                 UserPoolId=COGNITO_USER_POOL_ID,
-                Username=email,
+                Username=temp_username,
                 UserAttributes=[
                     {'Name': 'email', 'Value': email},
                     {'Name': 'email_verified', 'Value': 'true'}
                 ],
+                TemporaryPassword=temp_password,  # Set the temporary password
                 MessageAction='SUPPRESS'  # Use 'SUPPRESS' to skip sending the default email
             )
             add_email_to_budget_db(email)  # Add email to multi-user budget DB
-            send_email(email, link_only=False, temp_password='TemporaryPassword123!')  # Send email with link and temp password
+            send_email(email, link_only=False, temp_username=temp_username, temp_password=temp_password)  # Send email with temp username and password
             return jsonify({'message': 'Temporary user created and email sent.'}), 200
         
     except Exception as e:
@@ -73,14 +81,23 @@ def add_email_to_budget_db(email):
     pass    
 
     
-def send_email(email, link_only, temp_password=None):
+def send_email(email, link_only, temp_username=None, temp_password=None):
     # Initialize the SES client using environment variables set in Heroku
+    
+    def check_credentials():
+        session = botocore.session.get_session()
+        creds = session.get_credentials()
+        print("Creds loaded:", creds)
+        
+    check_credentials()
+
     ses_client = boto3.client(
-        'ses', 
+        'ses',
         aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
         aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-        region_name=os.getenv('AWS_DEFAULT_REGION')) 
-
+        region_name='us-east-2'
+    ) 
+        
     # Email content
     if link_only:
         subject = "You've Been Invited to Join the Budget"
@@ -98,8 +115,9 @@ def send_email(email, link_only, temp_password=None):
         body = f"""
         Hi,
 
-        You've been invited to join the budget. Use the following temporary password to log in and complete your account setup:
+        You've been invited to join the budget. Use the following temporary username and password to log in and complete your account setup:
 
+        Temporary Username: {temp_username}
         Temporary Password: {temp_password}
 
         Click the link below to log in:
@@ -130,30 +148,5 @@ def send_email(email, link_only, temp_password=None):
         print(f"Email sent to {email}: {response}")
     except Exception as e:
         print(f"Error sending email to {email}: {e}")
-# Testing the send_email function
 
-send_email('shekia313tillerson@gmail.com', link_only=False, temp_password='TemporaryPassword123!') 
 
-# set up the invite route for combined budget
-
-# @app.route('/send-invite', methods=['POST'])
-# def send_invite():
-#     email = request.json.get('email')
-#     if not email:
-#         return jsonify({'error': 'Email is required'}), 400
-
-#     try:
-#         # Initialize Cognito client
-#         client = boto3.client('cognito-idp', region_name=us-east-2)
-
-#         # Create user and send invite
-#         response = client.admin_create_user(
-#             UserPoolId=us-east-2_lHuYP7sWl,
-#             Username=email,
-#             UserAttributes=[
-#                 {'Name': 'email', 'Value': email},
-#                 {'Name': 'email_verified', 'Value': 'true'}
-#             ],
-            
-#             MessageAction='SUPPRESS'  # Use 'SUPPRESS' to skip sending the default email
-#         )
