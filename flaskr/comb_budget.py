@@ -1,5 +1,5 @@
 import sqlite3, boto3
-from db import *
+from .db import *
 import datetime
 from datetime import timezone
 

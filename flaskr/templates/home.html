@@ -186,27 +186,26 @@
                 
 
             <!-- Income Form -->
-            <section class="incomeForm" id="incomeForm" style="display: none;">
+            <section class="income-form" id="incomeForm" style="display: none;">
                 <h3>Enter Income</h3>
                     <form id="incomeForm">
                         <div>
                             <label for="date">Date:</label>
-                            <input type="text" id="date" name="date" required>
+                            <input type="text" id="incomeDate" name="date" required>
 
                             <label for="amount">Amount:</label>
-                            <input type="text" id="amount" name="amount" required>
+                            <input type="text" id="incomeAmount" name="amount" required>
 
                             <label for="memo">Memo:</label>
-                            <input type="text" id="memo" name="memo">
+                            <input type="text" id="incomeMemo" name="memo">
 
                             <!-- stay on same month and year -->
                         </div>
                         
-                        <button type="submit" id="submit">Submit</button>
+                        <button type="submit" id="submitIncomeBtn">Submit</button>
 
                         <!-- add styling-->
-                        <div id="incomeFeedbacMessage">
-                            <p></p>
+                        <div id="incomeFeedbackMessage">
                         </div>
                         </form>
             </section>
