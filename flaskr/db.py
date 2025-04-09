@@ -229,22 +229,22 @@ month_to_int = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, '
 #     app.cli.add_command(init_db_command)
 
 def get_db():
-    # if 'db' not in g:
-    #     g.db = psycopg2.connect(
-    #         host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
-    #         user='postgres',
-    #         password='D$0?#oh4h.$3D?|L]w6bZ#UICbU1',
-    #         database='MoneyMateDB',
-    #         port='5432'
-    #     )
-
     if 'db' not in g:
-        g.db = psycopg2.connect(
-            host='localhost',
-            user='nsteiner25',
-            database='awsBackup',
+         g.db = psycopg2.connect(
+             host='moneymatedb.chgss626mp8s.us-east-2.rds.amazonaws.com',
+            user='postgres',
+            password='D$0?#oh4h.$3D?|L]w6bZ#UICbU1',
+            database='MoneyMateDB',
             port='5432'
         )
+
+    # if 'db' not in g:
+    #     g.db = psycopg2.connect(
+    #         host='localhost',
+    #         user='nsteiner25',
+    #         database='awsBackup',
+    #         port='5432'
+    #     )
         
     return g.db
 
