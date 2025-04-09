@@ -148,5 +148,3 @@ def send_email(email, link_only, temp_username=None, temp_password=None):
         print(f"Email sent to {email}: {response}")
     except Exception as e:
         print(f"Error sending email to {email}: {e}")
-
-

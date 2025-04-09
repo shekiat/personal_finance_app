@@ -348,8 +348,8 @@ def write_income(user, amount, date, memo, user_id):
     if str(amount)[0] == '$':
         amount = int(str(amount)[1:])
 
-    data = (new_id, amount, date, memo if memo else '', user_id)
-    db_cursor.execute(f"INSERT INTO INCOME VALUES(%s, %s, %s, %s, %s)", data)
+    data = (new_id, amount, date, memo if memo else '', user_id[0])
+    db_cursor.execute(f"INSERT INTO INCOME (INCOME_ID, INCOME_AMOUNT, INCOME_DATE, INCOME_MEMO, USER_ID) VALUES(%s, %s, %s, %s, %s)", data)
     db.commit()
     db_cursor.close()
 
@@ -362,7 +362,7 @@ def read_income(month, year, user_id):
 
     for income in income_list_res:
         income_list_element = []
-        for i in range(len(income), user_id):
+        for i in range(len(income)):
             if i == 1:
                 income_list_element.append(float(income[i]))
             elif i == 2:
@@ -370,6 +370,8 @@ def read_income(month, year, user_id):
             else:
                 income_list_element.append(income[i])
         income_list.append(income_list_element)
+    
+    print(f"income list from db.py: {income_list}")
 
     return income_list
 
