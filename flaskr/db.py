@@ -452,7 +452,7 @@ def read_month_totals(month, year, user_id):
     else: 
         expense_total = 0
 
-    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
+    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id[0]))
     income_row = db_cursor.fetchone()[0]
     if  income_row != None:
         income_total = float(income_row)
