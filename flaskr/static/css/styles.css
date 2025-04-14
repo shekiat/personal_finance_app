@@ -327,3 +327,120 @@ header {
 }
 
 /* ------ End of Dashboard styling ------- */
+
+
+/* Combined Budget page styling */
+
+.combined-budget-body button {
+    color: white;
+    background-color: #19bc00;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+   
+}
+
+
+.combined-budget-body button:hover {
+    color: white;
+    background-color: #128300;
+   
+}
+
+.group-transactions {
+    margin-top: 50px;
+}
+
+.group-transactions table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.group-transaction-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transaction-form form {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 5px; 
+    flex-wrap: nowrap; 
+    
+}
+
+
+.transaction-form label {
+    margin-right: 0;
+}
+
+
+.transaction-form button {
+   
+    margin: 0 10px;
+    
+}
+
+.transaction-form #category{
+    width: 100px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+
+.transaction-form #subCategoryBtn {
+    width: 200px;
+    display:none;
+
+}
+.transaction-form #successMessage {
+    display:none;
+    color: green;
+}
+.transactions th, .transactions td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.transactions td.complete {
+    color: green;
+}
+
+.transactions td.failed {
+    color: red;
+}
+
+.transactions td.pending {
+    color: yellow;
+}
+
+.income table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.income th, .transactions td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.page-footer {
+    background-color: rgb(25, 26, 39);
+    color: white;
+    text-align: left;
+    font-size: small;
+    font-weight: 200;
+    padding: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+
+
+/* End of Combined Budget page styling */
