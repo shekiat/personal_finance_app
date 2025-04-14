@@ -168,7 +168,8 @@ function showFailDateMessage() {
 
 
 // button listeners for jsonify
-attachDeleteListeners()
+attachTransDeleteListeners();
+attachIncomeDeleteListeners();
 // submit transaction
 const submitTransBtn = document.getElementById("submitTransBtn");
 submitTransBtn.addEventListener("click", function() {
@@ -211,8 +212,11 @@ submitTransBtn.addEventListener("click", function() {
                 if (data.return_value === 1) {
                     document.getElementById("transactionFeedbackMessage").innerText = "Date is in the future!";
                 }
-                else {
+                else if (data.return_value === 2) {
                     document.getElementById("transactionFeedbackMessage").innerText = "Amount is not a number!";
+                }
+                else {
+                    document.getElementById("transactionFeedbackMessage").innerText = "Date is invalid!";
                 }
             }
         })
@@ -249,7 +253,7 @@ function updateTransactionTable(transactions) {
         tableBody.innerHTML += row;
     });
 
-    attachDeleteListeners();
+    attachTransDeleteListeners();
 }
 function formatDate(date) {
     return date[5] === "1"
@@ -268,13 +272,12 @@ function fetchUpdatedTransactions() {
     fetch("/api/update-transaction-table")
         .then(response => response.json())
         .then(data => {
-            console.log(data.transactions);
-            updateTransactionTable(data.transactions);
+            updateTransactionTable(data.trans_list);
         });
 }
 
 // attach delete listeners on table entries
-function attachDeleteListeners() {
+function attachTransDeleteListeners() {
     document.querySelectorAll('.delete-trans-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             console.log("delete button hit");
@@ -286,6 +289,126 @@ function attachDeleteListeners() {
                 },
                 body: JSON.stringify({
                     transaction_id: transactionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    event.target.closest('tr').remove();
+                    updateStats();
+                }
+            });
+        });
+    });
+}
+
+
+
+// submit income 
+const submitIncomeBtn = document.getElementById("submitIncomeBtn");
+submitIncomeBtn.addEventListener("click", function() {
+    event.preventDefault();
+    console.log("submit income button hit")
+    const formData = {
+        amount: document.getElementById("incomeAmount").value,
+        date: document.getElementById("incomeDate").value,
+        memo: document.getElementById("incomeMemo").value    };
+
+    fetch("/api/submit-income", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                console.log("income added succesfully")
+                document.getElementById("incomeFeedbackMessage").innerText = "Income added!";
+                document.getElementById("incomeAmount").value = "",
+                document.getElementById("incomeDate").value = "",
+                document.getElementById("incomeMemo").value = ""
+                // hide category inpiut, display dropdown
+
+                updateStats();
+                fetchUpdatedIncome();
+            }
+            else {
+                //assign each form input to the value of data.amount, data.date, etc.
+                document.getElementById("incomeAmount").value = data.amount,
+                document.getElementById("incomeDate").value = data.date,
+                document.getElementById("incomeMemo").value = data.memo
+                //document.getElementById("hidden-category").value = data.category
+                if (data.return_value === 1) {
+                    document.getElementById("incomeFeedbackMessage").innerText = "Date is in the future!";
+                }
+                else if (data.return_value === 2) {
+                    document.getElementById("incomeFeedbackMessage").innerText = "Amount is not a number!";
+                }
+                else {
+                    document.getElementById("incomeFeedbackMessage").innerText = "Date is invalid!";
+                }
+            }
+        })
+});
+
+
+// update transaction table
+function updateIncomeTable(income) {
+    console.log("updating income");
+    const tableBody = document.querySelector("#incomeTable table");
+
+    tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
+
+    income.forEach(income => {
+        const formattedDate = formatDate(income[2]);
+        const formattedAmount = formatAmount(income[1]);
+
+        const row = `
+            <tr>
+                <td>Jim Gorden</td>
+                <td>${formattedDate}</td>
+                <td>${formattedAmount}</td>
+                <td>${income[3]}</td>
+                <td>
+                    <button 
+                        class="delete-income-btn" 
+                        income-id="${income[0]}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+
+    attachIncomeDeleteListeners();
+}
+
+function fetchUpdatedIncome() {
+    console.log("fetching updated income")
+    fetch("/api/update-income-table")
+        .then(response => response.json())
+        .then(data => {
+            updateIncomeTable(data.income_list);
+        });
+}
+
+// attach delete listeners on table entries
+function attachIncomeDeleteListeners() {
+    document.querySelectorAll('.delete-income-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log("delete button hit");
+            const incomeId = event.target.getAttribute('income-id');
+            fetch('/api/delete-income', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    income_id: incomeId
                 })
             })
             .then(response => response.json())
@@ -318,9 +441,16 @@ submitDateBtn.addEventListener("click", function() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
-    });
-
-    updateStats()
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+    })
+    .then(data => {
+        updateStats()
+        fetchUpdatedTransactions()
+    })
 });
 
 

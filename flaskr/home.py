@@ -326,6 +326,7 @@ def home():
     if isinstance(session['current_month'], int):
         current_month_string = int_to_month[session['current_month']]
         
+    print(income_list)
     return render_template("home.html", trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = session['current_year'], current_month=session["current_month"], current_month_string=current_month_string)
     
 @bp.route('/api/submit-transaction', methods=['POST'])
@@ -343,31 +344,27 @@ def submit():
     # NOT NEEDED?
     # session['chosen_month'] = int(request.form['month'])
     # session['chosen_year'] = int(request.form['year'])
-
-    parsed_date_full = parse_date(date) # format date for comparison, to add to db
-    parsed_date = parsed_date_full.date()
-
-    current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d') # formatted for comparison vs current date
-
+    
     return_value = 0 # 0 = success, 1 = date is in the future, 2 = amount is not a valid number
 
+    try:
+        parsed_date_full = parse_date(date) # format date for comparison, to add to db
+        parsed_date = parsed_date_full.date()
+
+        current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d') # formatted for comparison vs current date
+    except AttributeError:
+        return jsonify({"return_value" : 3, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
+    
     try:
         float(amount)
         print(f"input date: {current_date}")
         print(f"current date: {datetime.datetime.now(tz=EST)}")
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
             write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
-        else:
-            return_value = 1      
-            return jsonify({"return_value" : return_value, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
+        else:     
+            return jsonify({"return_value" : 1, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
     except ValueError:
-        return_value = 2
-        return jsonify({"return_value" : return_value, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
-
-    trans_list = read_transactions(session['current_month'], session['current_year'], session["user_id"])
-    income_list = read_income(session['current_month'], session['current_year'], session["user_id"])
-    
-    
+        return jsonify({"return_value" : 2, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
 
     # try:
     #     float(amount)
@@ -400,42 +397,31 @@ def submit():
 
 @bp.route('/api/submit-income', methods=['POST'])
 def submit_inc():
-    amount = request.form.get('amount')
-    date = request.form.get('date')
-    memo = request.form.get('memo', '')
-
-    parsed_date_full = parse_date(date) # format date for comparison, to add to db
-    parsed_date = parsed_date_full.date()
-
-    current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
+    data = request.json
+    amount = data.get('amount')
+    date = data.get('date')
+    memo = data.get('memo', '')
 
     return_value = 0 # 0 = success, 1 = amount not valid, 2 = date is in the future
+
+    try:
+        parsed_date_full = parse_date(date) # format date for comparison, to add to db
+        parsed_date = parsed_date_full.date()
+
+        current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
+    except AttributeError:
+        return jsonify({"return_value" : 3, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
 
     try:
         float(amount)
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
             write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
         else:
-            return_value = 2
+            return jsonify({"return_value" : 1, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
     except ValueError:
-        return_value = 1
+        return jsonify({"return_value" : 2, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
     
-    return jsonify({"return_value" : return_value})
-
-
-@bp.route('/api/submit-date', methods=['POST'])
-def month_change():
-    data = request.json
-    month = data.get('month')
-    year = data.get('year')
-    print(f"submitted month: {month}")
-
-    month_number = datetime.datetime.strptime(month, "%B").month
-
-    session['current_month'] = int(month_number)
-    session['current_year'] = int(year)
-
-    return jsonify({"chosen_month" : month_number, "chosen_year" : year})
+    return jsonify({"return_value" : return_value, "success" : True})
 
 
 @bp.route('/api/delete-transaction', methods=['POST'])
@@ -463,6 +449,22 @@ def delete_inc():
     delete_income(income_id, session["user_id"])
 
     # Feedback that transaction has been deleted?
+
+    return jsonify({'success' : True})
+
+@bp.route('/api/submit-date', methods=['POST'])
+def month_change():
+    data = request.json
+    month = data.get('month')
+    year = data.get('year')
+    print(f"submitted month: {month}")
+
+    month_number = datetime.datetime.strptime(month, "%B").month
+
+    session['current_month'] = int(month_number)
+    session['current_year'] = int(year)
+
+    return jsonify({"chosen_month" : month_number, "chosen_year" : year})
 
 @bp.route("/api/update-stats", methods=["POST"])
 def update_stats_and_totals():
@@ -492,11 +494,11 @@ def update_stats_and_totals():
 
 @bp.route("/api/update-transaction-table")
 def update_transaction_table():
-    print(f"updating transaction")
+    print(f"updating transactions")
     trans_list = read_transactions(session["current_month"], session["current_year"], session["user_id"])
-    return trans_list
+    return jsonify({"trans_list": trans_list})
 
 @bp.route("/api/update-income-table")
 def update_income_table():
     income_list = read_income(session["current_month"], session["current_year"], session["user_id"])
-    return income_list
+    return jsonify({"income_list": income_list})

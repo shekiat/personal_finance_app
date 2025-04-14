@@ -38,8 +38,8 @@ def create_app(test_config=None, *args, **kwargs):
     db.init_app(app)
 
     # Load environment variables from .env file
-    from dotenv import load_dotenv
-    load_dotenv() # Load environment variables from .env file
+    # from dotenv import load_dotenv
+    # load_dotenv() # Load environment variables from .env file
 
     @app.route('/cognito-login')
     def login():
