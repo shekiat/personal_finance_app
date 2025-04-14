@@ -1,10 +1,9 @@
 
-
-
 {% block content %}
-<body class="combined_budget-body">
+<!----------- Email invite --------------->
+<body class="combined-budget-body">
 
-    <section id="budgetForm"> 
+    <section id="invite-form"> 
 
         <form id="inviteForm">
             <label for="email">Email:</label>
@@ -13,27 +12,207 @@
         </form>
     </section>
     
-    <!-- Budget Table -->
-    <section class="budget" id="budgetTable">
-        <h3>Budget Plans</h3>
+    <!-------------- Budget Tables ---------------->
+    <section class="budget-tables">
+
+        <!---------- Individual Income Table ------------>
+        <section class="individual-income-table" id="individualIncomeTable" >
+            <h2>Individual Income </h2>
+            <table id="individualIncomeTable">
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Memo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Individual income rows will be dynamically added here -->
+                </tbody>
+            </table>
+        </section>
+    
+        <!-- Group Income Form -->
+        <h2>Group Income</h2>
+        <section class="group-income-form" id="groupIncomeForm" >
+            <h3>Enter Income</h3>
+                <form id="groupIncomeForm">
+                    <div>
+                        <label for="date">Date:</label>
+                        <input type="text" id="date" name="date" required>
+
+                        <label for="amount">Amount:</label>
+                        <input type="text" id="amount" name="amount" required>
+
+                        <label for="memo">Memo:</label>
+                        <input type="text" id="memo" name="memo">
+
+                        <!-- stay on same month and year -->
+                    </div>
+                    
+                    <button type="submit" id="submit">Submit</button>
+
+                    <!-- add styling-->
+                    <div id="incomeFeedbackMessage">
+                        <p></p>
+                    </div>
+                    </form>
+
+        </section>
+
+        <!-- Group Income Table -->
+        <section class="group-income-table" id="groupIncomeTable" >
+            <h2>Group Income </h2>
+            <!--For loop for pulling income from db-->
+            <table id="groupIncomeTable">
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Memo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Group income rows will be dynamically added here -->
+                </tbody>
+            </table>
+        </section>
+    </section>
+
+    <!-- Group Transaction Table -->
+    
+        <h2>Group Transactions</h2>
+        <section class="group-transaction-form" id="transactionForm">
+            <h3>Enter Transaction</h3>
+            <form id="transForm">
+                <div>
+                    <label for="date">Date:</label>
+                    <input type="text" id="transDate" name="date" required>
+
+                    <label for="amount">Amount:</label>
+                    <input type="text" id="transAmount" name="amount" required>
+
+                    <label for="memo">Memo:</label>
+                    <input type="text" id="transMemo" name="memo">
+
+                    <!-- category input setup -->
+                    <div id="categoryDropdown">
+                        <label for="category-list">Category:</label>
+                        <select id="category-list" name="category-list">
+                            {% for category in category_list %}
+                                <option> {{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div id="categoryInput" style="display: none;">
+                        <label for="add-category">New Category:</label>
+                        <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
+                    </div>
+
+                    <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
+
+                    <button type="button" id="toggleCategoryBtn">Add Category</button>
+                </div>
+                
+                <button type="submit" id="submitTransBtn">Submit</button>
+
+                <!-- add styling-->
+                <div id="transactionFeedbackMessage">
+                </div>
+            </form>
+        </section>
+
+        <!-- Group Transaction Table -->
+        <section class="group-transaction-table" id="transactionTable">
+            
+            <table>
+                <tr>
+                    <th>User</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Memo</th>
+                    <th></th>
+
+                </tr>
+                <!--For loop for pulling transactions from db-->
+                {% for transaction in trans_list %}
+                <tr>
+                    <td>Jim Gorden</td>
+                    <!--format date-->
+                    {% if transaction[3][5] == "1" %}
+                        <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                    {% else %}
+                        <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                    {% endif %}
+                    <!--add zero to end of amount if it should end in one-->
+                    {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
+                        <td>${{transaction[1]}}0</td>
+                    {% else %}
+                        <td>${{transaction[1]}}</td>
+                    {% endif %}
+                    <td>{{transaction[2].title()}}</td>
+                    <td>{{transaction[4]}}</td>
+
+                    <!--delete transaction-->
+                    <td>
+                        <button 
+                            class="delete-trans-btn" 
+                            transaction-id="{{ transaction[0] }}">
+                            Delete
+                        </button>
+                    </td>
+                    
+
+                </tr>
+                {% endfor %}
+            </table>
+        </section>
+    
+
+    <!-- Group Income Table -->
+    <section class="group-income" id="groupIncomeTable" >
+        <h2>Group Income</h2>
         <table>
             <tr>
                 <th>User</th>
                 <th>Date</th>
                 <th>Amount</th>
-                <th>Category</th>
                 <th>Memo</th>
                 <th></th>
+            </tr>
+            <!--For loop for pulling income from db-->
+            {% for income in income_list %}
+            <tr>
+                <td>Jim Gorden</td>
+                <!--format date-->
+                {% if income[2][5] == "1" %}
+                    <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                {% else %}
+                    <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                {% endif %}
+                <!--add zero to end of amount if it should end in one-->
+                {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
+                    <td>${{income[1]}}0</td>
+                {% else %}
+                    <td>${{income[1]}}</td>
+                {% endif %}
+                <td>{{income[3]}}</td>
+
+                <!--delete income-->
+                <td>
+                    <button 
+                        class="delete-income-btn" 
+                        income-id="{{ income[0] }}">
+                        Delete
+                    </button>
+                </td>
 
             </tr>
-            
-            
-            <!--For loop for pulling budget plan info from db-->
-            
-             
-
-            </tr>
-            
+            {% endfor %}
         </table>
     </section>
 
