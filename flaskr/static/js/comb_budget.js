@@ -222,7 +222,7 @@ submitTransBtn.addEventListener("click", function() {
 // update transaction table
 function updateTransactionTable(transactions) {
     console.log("updating transactions");
-    const tableBody = document.querySelector("#transactionTable table");
+    const tableBody = document.querySelector("#groupTransactionTable table");
 
     tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
 
