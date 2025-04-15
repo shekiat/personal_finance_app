@@ -108,7 +108,7 @@ def dashboard_data():
     # get data for line graph
     months = ["January", "February", "March", "April", "May", "June", 
               "July", "August", "September", "October", "November", "December"]
-    total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(selected_year, session["user"]["email"])
+    total_balances, total_expenses, total_incomes = read_month_totals_for_line_graph(selected_year, session["user_id"])
     max_income_expense = max(total_expenses)
     max_income_expense = max(total_incomes) if max(total_incomes) > max_income_expense else max_income_expense
     max_income_expense = 500 * (math.ceil(max_income_expense / 500))

@@ -17,11 +17,6 @@ import botocore.session
 
 bp = Blueprint('combined_budget', __name__)
 
-
-@bp.route('/combined_budget')
-def combined_budget():
-    return(render_template("combined_budget.html"))
-
 # create temporary user 
 
 COGNITO_USER_POOL_ID = 'us-east-2_uiivhIHti'  
@@ -49,7 +44,7 @@ def invite_user():
 
         if user_exists:
             # User already exists
-            add_email_to_budget_db(email)  # Add email to multi-user budget DB
+            add_user_to_group(session["user_id"], email)  # Add email to multi-user budget DB
             send_email(email, link_only=True)  # Send email with link only
             return jsonify({'message': 'User already exists. Email sent with link only.'}), 200     
         else:
@@ -68,18 +63,12 @@ def invite_user():
                 TemporaryPassword=temp_password,  # Set the temporary password
                 MessageAction='SUPPRESS'  # Use 'SUPPRESS' to skip sending the default email
             )
-            add_email_to_budget_db(email)  # Add email to multi-user budget DB
+            add_user_to_group(email)  # Add email to multi-user budget DB
             send_email(email, link_only=False, temp_username=temp_username, temp_password=temp_password)  # Send email with temp username and password
             return jsonify({'message': 'Temporary user created and email sent.'}), 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-
-def add_email_to_budget_db(email):
-    # Add the email to your database for the multi-user budget
-    pass    
-
     
 def send_email(email, link_only, temp_username=None, temp_password=None):
     # Initialize the SES client using environment variables set in Heroku
@@ -148,3 +137,211 @@ def send_email(email, link_only, temp_username=None, temp_password=None):
         print(f"Email sent to {email}: {response}")
     except Exception as e:
         print(f"Error sending email to {email}: {e}")
+
+
+
+# copy over home.py functionality
+
+int_to_month = {
+    1 : "January",
+    2 : "February",
+    3 : "March",
+    4 : "April",
+    5 : "May",
+    6 : "June",
+    7 : "July",
+    8 : "August",
+    9 : "September",
+    10 : "October",
+    11 : "November",
+    12 : "December"
+}
+
+@bp.route('/combined_budget')
+def comb_budget():
+    # get group id, set as session variable
+    group_id = fetch_group_id(session["user_id"])
+    session["group_id"] = group_id
+
+    # get the totals and transactions for current month
+    trans_list = []
+    session['current_group_month'] = datetime.datetime.now().month
+    session['current_group_year'] = datetime.datetime.now().year
+
+    # fetch current and past month totals
+    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["user_id"])
+    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["user_id"])
+    # calculate differences, percent differences
+    total_diffs = [0, 0, 0]
+    total_diff_percs = [0, 0, 0]
+    if past_month_total_values != (0, 0, 0):
+        total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
+        for i in range(3):
+            if past_month_total_values[i] != 0:
+                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+
+    trans_list = read_transactions(session['current_group_month'], session['current_group_year'], session["user_id"])
+    income_list = read_income(session['current_group_month'], session['current_group_year'], session["user_id"])
+    
+    # format differences for presentation, JS SCRIPT
+    for i in range(3):
+        if total_diffs[i] < 0:
+            total_diffs[i] = "-$" + str(int(total_diffs[i]))[1:]
+        elif total_diffs[i] > 0:
+            total_diffs[i] = "+$" + str(total_diffs[i])
+
+    # get categories for drop down
+    category_list = read_categories(session["user_id"])
+
+    # year list portion, this is fetched from session variable
+
+    # month converted to string
+    if isinstance(session['current_group_month'], int):
+        current_month_string = int_to_month[session['current_group_month']]
+        
+    print(income_list)
+    return render_template("combined_budget.html", trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=session["year_list"], current_year = session['current_group_year'], current_month=session["current_group_month"], current_month_string=current_month_string, user_name=session['full_name'], user_email=session['user']['email'])
+    
+@bp.route('/api/group-submit-transaction', methods=['POST'])
+def group_submit():
+    data = request.json
+    amount = data.get('amount')
+    category = data.get('category')
+    date = data.get('date')
+    memo = data.get('memo', '')
+    print(f"amount: {amount}")
+    print(f"category: {category}")
+    print(f"date: {date}")
+    print(f"memo: {memo}")
+    
+    return_value = 0 # 0 = success, 1 = date is in the future, 2 = amount is not a valid number
+
+    try:
+        parsed_date_full = parse_date(date) # format date for comparison, to add to db
+        parsed_date = parsed_date_full.date()
+
+        current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d') # formatted for comparison vs current date
+    except AttributeError:
+        return jsonify({"return_value" : 3, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
+    
+    try:
+        float(amount)
+        print(f"input date: {current_date}")
+        print(f"current date: {datetime.datetime.now(tz=EST)}")
+        if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
+            write_transaction(user=session['full_name'], amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
+        else:     
+            return jsonify({"return_value" : 1, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
+    except ValueError:
+        return jsonify({"return_value" : 2, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
+
+    return jsonify({"return_value" : return_value, 'success' : True})
+
+
+@bp.route('/api/group-submit-income', methods=['POST'])
+def group_submit_inc():
+    data = request.json
+    amount = data.get('amount')
+    date = data.get('date')
+    memo = data.get('memo', '')
+
+    return_value = 0 # 0 = success, 1 = amount not valid, 2 = date is in the future
+
+    try:
+        parsed_date_full = parse_date(date) # format date for comparison, to add to db
+        parsed_date = parsed_date_full.date()
+
+        current_date = datetime.datetime.strptime(str(parsed_date), '%Y-%m-%d')
+    except AttributeError:
+        return jsonify({"return_value" : 3, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
+
+    try:
+        float(amount)
+        if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
+            write_income(user=session['full_name'], amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
+        else:
+            return jsonify({"return_value" : 1, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
+    except ValueError:
+        return jsonify({"return_value" : 2, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
+    
+    return jsonify({"return_value" : return_value, "success" : True})
+
+
+@bp.route('/api/group-delete-transaction', methods=['POST'])
+def group_delete():
+    data = request.json
+    transaction_id = data.get('transaction_id')
+
+    # REMOVE?
+    # session['chosen_month'] = int(data.get('month'))
+    # session['chosen_year'] = int(data.get('year'))
+
+    delete_transaction(transaction_id, session["user_id"])
+
+    return jsonify({'success' : True})
+
+@bp.route('/api/group-delete-income', methods=['POST'])
+def group_delete_inc():
+    data = request.json
+    income_id = data.get('income_id')
+    
+    # REMOVE?
+    # session['chosen_month'] = int(request.form['month'])
+    # session['chosen_year'] = int(request.form['year'])
+
+    delete_income(income_id, session["user_id"])
+
+    # Feedback that transaction has been deleted?
+
+    return jsonify({'success' : True})
+
+@bp.route('/api/group-submit-date', methods=['POST'])
+def group_month_change():
+    data = request.json
+    month = data.get('month')
+    year = data.get('year')
+    print(f"submitted month: {month}")
+
+    month_number = datetime.datetime.strptime(month, "%B").month
+
+    session['current_group_month'] = int(month_number)
+    session['current_group_year'] = int(year)
+
+    return jsonify({"chosen_month" : month_number, "chosen_year" : year})
+
+@bp.route("/api/group-update-stats", methods=["POST"])
+def group_update_stats_and_totals():
+    # fetch current and past month totals
+    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["user_id"])
+    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["user_id"])
+    # calculate differences, percent differences
+    total_diffs = [0, 0, 0]
+    total_diff_percs = [0, 0, 0]
+    if past_month_total_values != (0, 0, 0):
+        total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
+        for i in range(3):
+            if past_month_total_values[i] != 0:
+                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+
+    for i in range(3):
+        if total_diffs[i] < 0:
+            total_diffs[i] = "-$" + str(int(total_diffs[i]))[1:]
+        elif total_diffs[i] > 0:
+            total_diffs[i] = "+$" + str(total_diffs[i])
+    print(f'total_values: {total_values}')
+    return jsonify({
+        "total_values": total_values,
+        "total_diffs": total_diffs,
+        "total_diff_percs": total_diff_percs
+    })
+
+@bp.route("/api/group-update-transaction-table")
+def group_update_transaction_table():
+    print(f"updating transactions")
+    trans_list = read_transactions(session["current_group_month"], session["current_group_year"], session["user_id"])
+    return jsonify({"trans_list": trans_list})
+
+@bp.route("/api/group-update-income-table")
+def group_update_income_table():
+    income_list = read_income(session["current_group_month"], session["current_group_year"], session["user_id"])
+    return jsonify({"income_list": income_list})

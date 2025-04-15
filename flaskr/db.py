@@ -1,4 +1,4 @@
-from flask import current_app, g
+from flask import current_app, g, session
 import sqlite3
 import datetime
 import click
@@ -262,19 +262,47 @@ def parse_date(date):
 def fetch_user_id(user_email):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    db_cursor.execute("SELECT USER_ID FROM USERS WHERE EMAIL = %s", (user_email,))
+    db_cursor.execute("SELECT * FROM USERS WHERE EMAIL = %s", (user_email,))
     user_id_row = db_cursor.fetchall()
     if len(user_id_row) == 0:
         db_cursor.execute("SELECT MAX(USER_ID) FROM USERS")
         user_id = db_cursor.fetchall()[0][0] + 1
-        db_cursor.execute("INSERT INTO USERS VALUES (%s, %s)", (user_id, user_email)) # create user in USERS
+
+        # get user's full name
+        cognito_client = boto3.client('cognito-idp', region_name='us-east-2')
+        cognito_user = cognito_client.admin_get_user(
+            UserPoolId='us-east-2_uiivhIHti',
+            Username=user_email
+        )
+        print('\n')
+        print(cognito_user)
+        print('\n')
+        for attr in cognito_user['UserAttributes']:
+           print(attr)
+           if attr['Name'] == 'name':
+              user_name = attr['Value']
+
+        # insert user into db
+        db_cursor.execute("INSERT INTO USERS VALUES (%s, %s, %s)", (user_id, user_email, user_name)) # create user in USERS
         db.commit()
     else:
-        user_id = user_id_row[0]
+        user_id = user_id_row[0][0]
+        user_name = user_id_row[0][2]
+
     db_cursor.close()
 
-    return user_id
+    return user_id, user_name
 
+def fetch_group_id(user_id):
+    db = get_db()
+    db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    db_cursor.execute("SELECT GROUP_ID FROM USER_GROUPS WHERE USER_1_ID = %s OR USER_2_ID = %s OR USER_3_ID = %s OR USER_4_ID = %s OR USER_5_ID = %s", (user_id[0], user_id[0], user_id[0], user_id[0], user_id[0]))
+    group_id_row = db_cursor.fetchall()[0][0]
+
+    if group_id_row != []:
+        return group_id_row
+    else:
+        return None
 
 
 # transactions
@@ -317,6 +345,7 @@ def read_transactions(month, year, user_id):
                 trans_list_element.append(transaction[i].strftime('%Y-%m-%d'))
             else:
                 trans_list_element.append(transaction[i])
+        trans_list_element.append(session['full_name'])
         trans_list.append(trans_list_element)
 
     return trans_list
@@ -368,6 +397,7 @@ def read_income(month, year, user_id):
                 income_list_element.append(income[i].strftime('%Y-%m-%d'))
             else:
                 income_list_element.append(income[i])
+        income_list_element.append(session['full_name'])
         income_list.append(income_list_element)
     
     print(f"income list from db.py: {income_list}")
@@ -442,6 +472,7 @@ def delete_income(income_id, user_id):
 #     db_cursor.close()
 
 def read_month_totals(month, year, user_id):
+
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -508,23 +539,35 @@ def read_category_totals_for_pie_graph(month, year, user_id):
 
 
 # group budget function
-def add_user_to_group(creator_id, new_user_id):
+def add_user_to_group(creator_id, new_user_email):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    print(f"new user email: {new_user_email}")
+    new_user_id, _ = fetch_user_id(new_user_email)
+    print(f"new user id: {new_user_id}")
 
     db_cursor.execute("SELECT GROUP_ID FROM USER_GROUPS WHERE USER_1_ID = %s", creator_id)
     group_id_row = db_cursor.fetchall()
     if len(group_id_row) == 0:
         db_cursor.execute("SELECT MAX(group_ID) FROM USER_GROUPS")
-        group_id = db_cursor.fetchall()[0][0] + 1
-        db_cursor.execute("INSERT INTO USER_GROUPS (GROUP_ID, USER_1_ID, USER_2_ID) VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id, new_user_id))
+        groud_id_row = db_cursor.fetchall()[0][0]
+        if group_id_row != []:
+            group_id = group_id_row + 1
+        else:
+            group_id = 1
+        db_cursor.execute("INSERT INTO USER_GROUPS VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id[0], new_user_id))
+        print("budget created, user added")
     else:
+        group_id = group_id_row[0][0]
         for i in range(3, 6):
             if group_id_row[0][i] == 0:
                 new_user_number = f"USER_{i}_ID"
                 db_cursor.execute(f"INSERT INTO USER_GROUPS ({new_user_number}) VALUES (%s) WHERE GROUP_ID = %s", (new_user_id, group_id))
+        print("user added to budget")
     
     db.commit()
+
+
 
 
 def init_db():

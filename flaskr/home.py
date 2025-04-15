@@ -130,7 +130,7 @@
 #         float(amount)
 
 #         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-#             write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
+#             write_transaction(user=session['full_name'], amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
 #             session['submit_successful'] = True
 #         else:
 #             # if the date is in the future, notify user, add info to session so it stays in the input boxes
@@ -175,7 +175,7 @@
 #     try:
 #         float(amount)
 #         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-#             write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
+#             write_income(user=session['full_name'], amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
 #             session['submit_successful'] = True
 #         else:
 #             # if the date is in the future, notify user, add info to session so it stays in the input boxes
@@ -327,7 +327,7 @@ def home():
         current_month_string = int_to_month[session['current_month']]
         
     print(income_list)
-    return render_template("home.html", trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = session['current_year'], current_month=session["current_month"], current_month_string=current_month_string)
+    return render_template("home.html", trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=year_list, current_year = session['current_year'], current_month=session["current_month"], current_month_string=current_month_string, user_name=session['full_name'], user_email=session['user']['email'])
     
 @bp.route('/api/submit-transaction', methods=['POST'])
 def submit():
@@ -360,7 +360,7 @@ def submit():
         print(f"input date: {current_date}")
         print(f"current date: {datetime.datetime.now(tz=EST)}")
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-            write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
+            write_transaction(user=session['full_name'], amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
         else:     
             return jsonify({"return_value" : 1, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
     except ValueError:
@@ -370,7 +370,7 @@ def submit():
     #     float(amount)
 
     #     if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-    #         write_transaction(user="Jim Gorden", amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
+    #         write_transaction(user=session['full_name'], amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
     #         session['submit_successful'] = True
     #     else:
     #         # if the date is in the future, notify user, add info to session so it stays in the input boxes
@@ -415,7 +415,7 @@ def submit_inc():
     try:
         float(amount)
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-            write_income(user="Jim Gorden", amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
+            write_income(user=session['full_name'], amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
         else:
             return jsonify({"return_value" : 1, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
     except ValueError:
