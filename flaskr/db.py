@@ -586,3 +586,32 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db) # call when cleaning up after returning response
     app.cli.add_command(init_db_command)
+
+# group chat functions
+def insert_group_message(group_id, user_id, message):
+    """Insert a new message into the GROUP_CHAT table."""
+    db = get_db()
+    db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    db_cursor.execute(
+        "INSERT INTO GROUP_CHAT (group_id, user_id, message) VALUES (%s, %s, %s)",
+        (group_id, user_id, message)
+    )
+    db.commit()
+    db_cursor.close()
+
+
+def fetch_group_messages(group_id, limit=50):
+    """Fetch the latest messages for a group."""
+    db = get_db()
+    db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    db_cursor.execute("""
+        SELECT u.username, gc.message, gc.timestamp
+        FROM GROUP_CHAT gc
+        JOIN USERS u ON gc.user_id = u.user_id
+        WHERE gc.group_id = %s
+        ORDER BY gc.timestamp DESC
+        LIMIT %s
+    """, (group_id, limit))
+    messages = db_cursor.fetchall()
+    db_cursor.close()
+    return messages

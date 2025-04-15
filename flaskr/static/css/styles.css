@@ -333,3 +333,193 @@ header {
 }
 
 /* ------ End of Dashboard styling ------- */
+
+
+/* Combined Budget page styling */
+
+.combined-budget-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.combined-budget-body button {
+    color: white;
+    background-color: #19bc00;
+    border-radius: 5px;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+   
+}
+
+
+.combined-budget-body button:hover {
+    color: white;
+    background-color: #128300;
+   
+}
+
+.group-transactions {
+    margin-top: 50px;
+}
+
+.group-transactions table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.group-transaction-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transaction-form form {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 5px; 
+    flex-wrap: nowrap; 
+    
+}
+
+
+.transaction-form label {
+    margin-right: 0;
+}
+
+
+.transaction-form button {
+   
+    margin: 0 10px;
+    
+}
+
+.transaction-form #category{
+    width: 100px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+
+.transaction-form #subCategoryBtn {
+    width: 200px;
+    display:none;
+
+}
+.transaction-form #successMessage {
+    display:none;
+    color: green;
+}
+.transactions th, .transactions td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.transactions td.complete {
+    color: green;
+}
+
+.transactions td.failed {
+    color: red;
+}
+
+.transactions td.pending {
+    color: yellow;
+}
+
+.income table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.income th, .transactions td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+/* Group Chat Styling */
+.group-chat {
+    position: fixed;
+    right: 20px; 
+    top: 20px; 
+    width: 300px; 
+    height: 30%; 
+    background-color: #3d3d3d;
+    border: 1px solid #a8a8a8;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.group-chat h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #0053ac;
+    color: white;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.chat-messages div {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.chat-messages .user-message {
+    background-color: #e9ecef;
+    text-align: left;
+}
+
+.chat-messages .my-message {
+    background-color: #007bff;
+    color: white;
+    text-align: right;
+}
+
+#chatForm {
+    display: flex;
+    padding: 10px;
+    gap: 5px;
+}
+
+#chatInput {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#chatForm button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#chatForm button:hover {
+    background-color: #0056b3;
+}
+
+/* End of Combined Budget page styling */
