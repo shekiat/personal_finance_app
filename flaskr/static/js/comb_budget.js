@@ -299,3 +299,76 @@ function attachDeleteListeners() {
         });
     });
 }
+
+
+// group chat functionality
+
+document.getElementById('chatForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const chatInput = document.getElementById('chatInput');
+    const message = chatInput.value.trim();
+
+    if (message) {
+        // Display the message in the chat box
+        addMessageToChat('You', message);
+
+        // Send the message to the server
+        try {
+            const response = await fetch('/api/send-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const result = await response.json();
+            if (!result.success) {
+                console.error('Failed to send message:', result.error);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+
+        // Clear the input field
+        chatInput.value = '';
+    }
+});
+
+// Function to add a message to the chat box
+function addMessageToChat(user, message) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = user === 'You' ? 'my-message' : 'user-message';
+    messageDiv.textContent = `${user}: ${message}`;
+    chatMessages.appendChild(messageDiv);
+
+    // Scroll to the bottom of the chat box
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Function to fetch and display new messages
+async function fetchMessages() {
+    try {
+        const response = await fetch('/api/get-messages');
+        const result = await response.json();
+
+        if (result.success) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = ''; // Clear existing messages
+
+            result.messages.forEach((msg) => {
+                addMessageToChat(msg.user, msg.message);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+    }
+}
+
+// Poll for new messages every 5 seconds
+setInterval(fetchMessages, 5000);
+
+// Initial fetch of messages
+fetchMessages();

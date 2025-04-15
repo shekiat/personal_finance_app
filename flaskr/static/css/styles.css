@@ -331,6 +331,14 @@ header {
 
 /* Combined Budget page styling */
 
+.combined-budget-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
 .combined-budget-body button {
     color: white;
     background-color: #19bc00;
@@ -430,17 +438,82 @@ header {
     border-bottom: 1px solid #333;
 }
 
-.page-footer {
-    background-color: rgb(25, 26, 39);
-    color: white;
-    text-align: left;
-    font-size: small;
-    font-weight: 200;
-    padding: 10px;
-    width: 100%;
-    margin-top: 20px;
+/* Group Chat Styling */
+.group-chat {
+    position: fixed;
+    right: 20px; 
+    top: 20px; 
+    width: 300px; 
+    height: 30%; 
+    background-color: #3d3d3d;
+    border: 1px solid #a8a8a8;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.group-chat h2 {
+    margin: 0;
+    padding: 10px;
+    background-color: #0053ac;
+    color: white;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+}
 
+.chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.chat-messages div {
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.chat-messages .user-message {
+    background-color: #e9ecef;
+    text-align: left;
+}
+
+.chat-messages .my-message {
+    background-color: #007bff;
+    color: white;
+    text-align: right;
+}
+
+#chatForm {
+    display: flex;
+    padding: 10px;
+    gap: 5px;
+}
+
+#chatInput {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#chatForm button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#chatForm button:hover {
+    background-color: #0056b3;
+}
 
 /* End of Combined Budget page styling */
