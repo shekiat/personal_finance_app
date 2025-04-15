@@ -86,6 +86,12 @@ body {
     justify-content: center;
 }
 
+/* ----- Combined Budget Styling ------ */
+.combined_budget-body {
+    text-align: center;
+    padding: 50px;
+}
+
 
 .content {
     flex: 1;
