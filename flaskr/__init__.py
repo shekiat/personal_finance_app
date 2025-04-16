@@ -1,4 +1,4 @@
-from flask import Flask, session, redirect, url_for
+from flask import Flask, session, redirect, request, url_for
 from authlib.integrations.flask_client import OAuth
 import os
 import requests
@@ -49,26 +49,50 @@ def create_app(test_config=None, *args, **kwargs):
 
       state = os.urandom(16).hex() 
       session['state'] = state
-      return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
-      # return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state, prompt='login')
+
+      print(f"Generated nonce: {nonce}")
+      print(f"Generated state: {state}")
+      # return oauth.oidc.authorize_redirect('https://money-mate-f79a354aaf62.herokuapp.com/callback', nonce=nonce, state=state)
+      return oauth.oidc.authorize_redirect('http://localhost:5000/callback', nonce=nonce, state=state, prompt='login')
 
     @app.route('/cognito-logout')
     def logout():
       session.clear()
-      cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
-      # cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000/"
+      # cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=https://money-mate-f79a354aaf62.herokuapp.com/"
+      cognito_logout_url = f"https://us-east-2uiivhihti.auth.us-east-2.amazoncognito.com/logout?client_id={app.config['CLIENT_ID']}&logout_uri=http://localhost:5000/"
       return redirect(cognito_logout_url)
     
     @app.route('/callback')
     def callback():
+        
+        state = session.pop('state', None)
+        request_state = request.args.get('state')
+
+        if state is None or state != request_state:
+          print(f"State mismatch: Session state = {state}, Request state = {request_state}")
+          raise ValueError("State mismatch")
+
+
         token = oauth.oidc.authorize_access_token()
-        nonce = session.pop('nonce')
+
+        nonce = session.pop('nonce', None)
+        
         user_info = oauth.oidc.parse_id_token(token, nonce=nonce) 
         print(user_info)
         session["user"] = user_info  
         session["user_id"], session["full_name"] = fetch_user_id(session["user"]["email"])
         print(f"email: {session['user']['email']}")
         print(f"user id: {session['user_id']}")
+
+        state = os.urandom(16).hex() 
+        session['state'] = state
+        
+    
+        print(f"Session state: {state}")
+        print(f"Request state: {request.args.get('state')}")
+
+        
+
 
         return redirect("/")  
 
