@@ -167,8 +167,8 @@ def comb_budget():
     session['current_group_year'] = datetime.datetime.now().year
 
     # fetch current and past month totals
-    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["user_id"])
-    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["user_id"])
+    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
+    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["group_id"], 1)
     # calculate differences, percent differences
     total_diffs = [0, 0, 0]
     total_diff_percs = [0, 0, 0]
@@ -178,8 +178,8 @@ def comb_budget():
             if past_month_total_values[i] != 0:
                 total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
 
-    trans_list = read_transactions(session['current_group_month'], session['current_group_year'], session["user_id"])
-    income_list = read_income(session['current_group_month'], session['current_group_year'], session["user_id"])
+    trans_list = read_transactions(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
+    income_list = read_income(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
     
     # format differences for presentation, JS SCRIPT
     for i in range(3):
@@ -189,7 +189,7 @@ def comb_budget():
             total_diffs[i] = "+$" + str(total_diffs[i])
 
     # get categories for drop down
-    category_list = read_categories(session["user_id"])
+    category_list = read_categories(session["group_id"], 1)
 
     # year list portion, this is fetched from session variable
 
@@ -227,7 +227,7 @@ def group_submit():
         print(f"input date: {current_date}")
         print(f"current date: {datetime.datetime.now(tz=EST)}")
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-            write_transaction(user=session['full_name'], amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"])
+            write_transaction(user=session['full_name'], amount=amount, category=category.lower(), date=parsed_date, memo=memo, user_id=session["user_id"], group_id=session["group_id"])
         else:     
             return jsonify({"return_value" : 1, 'success' : False, 'amount': amount, 'date': date, 'category': category, 'memo': memo})
     except ValueError:
@@ -256,7 +256,7 @@ def group_submit_inc():
     try:
         float(amount)
         if EST.localize(current_date) <= datetime.datetime.now(tz=EST):
-            write_income(user=session['full_name'], amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"])
+            write_income(user=session['full_name'], amount=amount, date=parsed_date, memo=memo, user_id=session["user_id"], group_id=session["group_id"])
         else:
             return jsonify({"return_value" : 1, "success" : False, 'amount': amount, 'date': date, 'memo': memo})
     except ValueError:
@@ -274,7 +274,7 @@ def group_delete():
     # session['chosen_month'] = int(data.get('month'))
     # session['chosen_year'] = int(data.get('year'))
 
-    delete_transaction(transaction_id, session["user_id"])
+    delete_transaction(transaction_id, 1)
 
     return jsonify({'success' : True})
 
@@ -287,7 +287,7 @@ def group_delete_inc():
     # session['chosen_month'] = int(request.form['month'])
     # session['chosen_year'] = int(request.form['year'])
 
-    delete_income(income_id, session["user_id"])
+    delete_income(income_id, 1)
 
     # Feedback that transaction has been deleted?
 
@@ -310,8 +310,8 @@ def group_month_change():
 @bp.route("/api/group-update-stats", methods=["POST"])
 def group_update_stats_and_totals():
     # fetch current and past month totals
-    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["user_id"])
-    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["user_id"])
+    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
+    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["group_id"], 1)
     # calculate differences, percent differences
     total_diffs = [0, 0, 0]
     total_diff_percs = [0, 0, 0]
@@ -336,12 +336,12 @@ def group_update_stats_and_totals():
 @bp.route("/api/group-update-transaction-table")
 def group_update_transaction_table():
     print(f"updating transactions")
-    trans_list = read_transactions(session["current_group_month"], session["current_group_year"], session["user_id"])
+    trans_list = read_transactions(session["current_group_month"], session["current_group_year"], session["group_id"], 1)
     return jsonify({"trans_list": trans_list})
 
 @bp.route("/api/group-update-income-table")
 def group_update_income_table():
-    income_list = read_income(session["current_group_month"], session["current_group_year"], session["user_id"])
+    income_list = read_income(session["current_group_month"], session["current_group_year"], session["group_id"], 1)
     return jsonify({"income_list": income_list})
   
 # call group chat functions from db.py

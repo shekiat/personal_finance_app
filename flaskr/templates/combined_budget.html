@@ -274,7 +274,7 @@
                     <!--For loop for pulling transactions from db-->
                     {% for transaction in trans_list %}
                     <tr>
-                        <td>{{ transaction[8] }}</td>
+                        <td>{{ transaction[9] }}</td>
                         <!--format date-->
                         {% if transaction[3][5] == "1" %}
                             <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
@@ -320,7 +320,7 @@
                     <!--For loop for pulling income from db-->
                     {% for income in income_list %}
                     <tr>
-                        <td>{{ income[7] }}</td>
+                        <td>{{ income[8] }}</td>
                         <!--format date-->
                         {% if income[2][5] == "1" %}
                             <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
