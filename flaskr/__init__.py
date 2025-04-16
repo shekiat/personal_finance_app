@@ -64,15 +64,11 @@ def create_app(test_config=None, *args, **kwargs):
     
     @app.route('/callback')
     def callback():
-        
         state = session.pop('state', None)
         request_state = request.args.get('state')
-
         if state is None or state != request_state:
           print(f"State mismatch: Session state = {state}, Request state = {request_state}")
           raise ValueError("State mismatch")
-
-
         token = oauth.oidc.authorize_access_token()
 
         nonce = session.pop('nonce', None)

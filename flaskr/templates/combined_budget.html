@@ -59,298 +59,302 @@
             </form>
         </section>
 
-        <!-- Main Content -->
-        <main class="content">
-            <h3 id="monthYearHeader">{{ current_month_string }} {{ current_year }}</h3>
-            <body>
-                <button id="toggleBtn">Change Month/Year</button>
-                <div id="content">
-                    <!--Date Selection-->
-                    <section class="date-selection">
-                        <h3>Choose Date Range</h3>
-                        <form id="dateForm">
-                            <script>
-                                var chosen_year = {{ current_year }}
-                            </script>
-                        
-                            <label for="month">Month:</label>
-                            <select id="month" name="month">
-                                <option value="January" {% if current_month == 1 %}selected{% endif %}>January</option>
-                                <option value="February" {% if current_month == 2 %}selected{% endif %}>February</option>
-                                <option value="March" {% if current_month == 3 %}selected{% endif %}>March</option>
-                                <option value="April" {% if current_month == 4 %}selected{% endif %}>April</option>
-                                <option value="May" {% if current_month == 5 %}selected{% endif %}>May</option>
-                                <option value="June" {% if current_month == 6 %}selected{% endif %}>June</option>
-                                <option value="July" {% if current_month == 7 %}selected{% endif %}>July</option>
-                                <option value="August" {% if current_month == 8 %}selected{% endif %}>August</option>
-                                <option value="September" {% if current_month == 9 %}selected{% endif %}>September</option>
-                                <option value="October" {% if current_month == 10 %}selected{% endif %}>October</option>
-                                <option value="November" {% if current_month == 11 %}selected{% endif %}>November</option>
-                                <option value="December" {% if current_month == 12 %}selected{% endif %}>December</option>
-                            </select>
-        
-                            <label for="year">Year: </label>
-                            <select id="year" name="year"></select>
-                            <button type="button" id="submitDateBtn">Submit</button>
-
-        
-        
-                        </form>
-        
-                    </section>
-                </div>
-
-                <script>
-                    const btn = document.getElementById("toggleBtn");
-                    const content = document.getElementById("content");
-                    content.style.display = "none";
-                    btn.textContent = "Change Month/Year";
-
-                    btn.addEventListener("click", function() {
-                        if (content.style.display === "none" || content.style.display === "") {
-                            content.style.display = "block";
-                            btn.textContent = "Hide";
-                        } else {
-                            content.style.display = "none";
-                            btn.textContent = "Change Month/Year";
-                        }
-                    });
-                </script>
-            </body>
-            </html>            
-
-
-
-            <!-- Dashboard Stats -->
-            <section class="stats">
-                <div class="stat-box">
-                    <h4>Total Balance</h4>
-                    {% if (total_values[0] | string)[total_values[0] | string | length - 2 ] == "." %}
-                        <p>${{total_values[0]}}0</p>
-                    {% else %}
-                        <p>${{total_values[0]}}</p>
-                    {% endif %}
-                    
-                    {% if total_diffs[0] != 0 %}
-                        {% if (total_diffs[0] | string)[total_diffs[0] | string | length - 2 ] == "." %}
-                            <p>{{total_diffs[0]}}0 ({{total_diff_percs[0]}}%)</p>
-                        {% else %}
-                            <p>{{total_diffs[0]}} ({{total_diff_percs[0]}}%)</p>
-                        {% endif %}
-                    {% else %}
-                        <p>-</p>
-                    {% endif %}
-                </div>
-                
-                <div class="stat-box">
-                    <h4>Total Expense</h4>
-                    {% if (total_values[1] | string)[total_values[1] | string | length - 2 ] == "." %}
-                        <p>${{total_values[1]}}0</p>
-                    {% else %}
-                        <p>${{total_values[1]}}</p>
-                    {% endif %}
-                    
-                    {% if total_diffs[1] != 0 %}
-                        {% if (total_diffs[1] | string)[total_diffs[1] | string | length - 2 ] == "." %}
-                            <p>{{total_diffs[1]}}0 ({{total_diff_percs[1]}}%)</p>
-                        {% else %}
-                            <p>{{total_diffs[1]}} ({{total_diff_percs[1]}}%)</p>
-                        {% endif %}
-                    {% else %}
-                        <p>-</p>
-                    {% endif %}
-                    <button class="addIncomeExpense" type="button" id="addExpenseButton" style="display: none; justify-content: center;">Add/View Expenses</button>
-                </div>
-
-                <div class="stat-box">
-                    <h4>Total Income</h4>
-                    <div class="incomeContainer">
-                        {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
-                            <p>${{total_values[2]}}0</p>
-                        {% else %}
-                            <p>${{total_values[2]}}</p>
-                        {% endif %}
-                    </div>
-                    {% if total_diffs[2] != 0 %}
-                        {% if (total_diffs[2] | string)[total_diffs[2] | string | length - 2 ] == "." %}
-                            <p>{{total_diffs[2]}}0 ({{total_diff_percs[2]}}%)</p>
-                        {% else %}
-                            <p>{{total_diffs[2]}} ({{total_diff_percs[2]}}%)</p>
-                        {% endif %}
-                    {% else %}
-                        <p>-</p>
-                    {% endif %}
-                    <div><button class="addIncomeExpense" type="button" id="addIncomeButton" style="justify-content: center;">Add/View Income</button></div>
-                </div>
-                
-            </section>
-
-
-
-            <!-- Transaction Form -->
-            <section class="transaction-form" id="transactionForm">
-                <h3>Enter Transaction</h3>
-                <form id="transForm">
-                    <div>
-                        <label for="date">Date:</label>
-                        <input type="text" id="transDate" name="date" required>
-
-                        <label for="amount">Amount:</label>
-                        <input type="text" id="transAmount" name="amount" required>
-
-                        <label for="memo">Memo:</label>
-                        <input type="text" id="transMemo" name="memo">
-
-                        <!-- category input setup -->
-                        <div id="categoryDropdown">
-                            <label for="category-list">Category:</label>
-                            <select id="category-list" name="category-list">
-                                {% for category in category_list %}
-                                    <option> {{ category }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div id="categoryInput" style="display: none;">
-                            <label for="add-category">New Category:</label>
-                            <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
-                        </div>
-
-                        <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
-
-                        <button type="button" id="toggleCategoryBtn">Add Category</button>
-                    </div>
-                    
-                    <button type="submit" id="submitTransBtn">Submit</button>
-
-                    <!-- add styling-->
-                    <div id="transactionFeedbackMessage">
-                    </div>
-                </form>
-            </section>
-                
-
-            <!-- Income Form -->
-            <section class="income-form" id="incomeForm" style="display: none;">
-                <h3>Enter Income</h3>
-                    <form id="incomeForm">
-                        <div>
-                            <label for="date">Date:</label>
-                            <input type="text" id="incomeDate" name="date" required>
-
-                            <label for="amount">Amount:</label>
-                            <input type="text" id="incomeAmount" name="amount" required>
-
-                            <label for="memo">Memo:</label>
-                            <input type="text" id="incomeMemo" name="memo">
-
-                            <!-- stay on same month and year -->
-                        </div>
-                        
-                        <button type="submit" id="submitIncomeBtn">Submit</button>
-
-                        <!-- add styling-->
-                        <div id="incomeFeedbackMessage">
-                        </div>
-                        </form>
-            </section>
+        {% if budget_exists == 0 %}
+        <body></body>
+        {% else %}
+            <!-- Main Content -->
+            <main class="content">
+                <h3 id="monthYearHeader">{{ current_month_string }} {{ current_year }}</h3>
+                <body>
+                    <button id="toggleBtn">Change Month/Year</button>
+                    <div id="content">
+                        <!--Date Selection-->
+                        <section class="date-selection">
+                            <h3>Choose Date Range</h3>
+                            <form id="dateForm">
+                                <script>
+                                    var chosen_year = {{ current_year }}
+                                </script>
+                            
+                                <label for="month">Month:</label>
+                                <select id="month" name="month">
+                                    <option value="January" {% if current_month == 1 %}selected{% endif %}>January</option>
+                                    <option value="February" {% if current_month == 2 %}selected{% endif %}>February</option>
+                                    <option value="March" {% if current_month == 3 %}selected{% endif %}>March</option>
+                                    <option value="April" {% if current_month == 4 %}selected{% endif %}>April</option>
+                                    <option value="May" {% if current_month == 5 %}selected{% endif %}>May</option>
+                                    <option value="June" {% if current_month == 6 %}selected{% endif %}>June</option>
+                                    <option value="July" {% if current_month == 7 %}selected{% endif %}>July</option>
+                                    <option value="August" {% if current_month == 8 %}selected{% endif %}>August</option>
+                                    <option value="September" {% if current_month == 9 %}selected{% endif %}>September</option>
+                                    <option value="October" {% if current_month == 10 %}selected{% endif %}>October</option>
+                                    <option value="November" {% if current_month == 11 %}selected{% endif %}>November</option>
+                                    <option value="December" {% if current_month == 12 %}selected{% endif %}>December</option>
+                                </select>
+            
+                                <label for="year">Year: </label>
+                                <select id="year" name="year"></select>
+                                <button type="button" id="submitDateBtn">Submit</button>
 
             
+            
+                            </form>
+            
+                        </section>
+                    </div>
+
+                    <script>
+                        const btn = document.getElementById("toggleBtn");
+                        const content = document.getElementById("content");
+                        content.style.display = "none";
+                        btn.textContent = "Change Month/Year";
+
+                        btn.addEventListener("click", function() {
+                            if (content.style.display === "none" || content.style.display === "") {
+                                content.style.display = "block";
+                                btn.textContent = "Hide";
+                            } else {
+                                content.style.display = "none";
+                                btn.textContent = "Change Month/Year";
+                            }
+                        });
+                    </script>
+                </body>
+                </html>            
 
 
-            <!-- Transaction Table -->
-            <section class="transactions" id="transactionTable">
-                <h3>Transactions</h3>
-                <table>
-                    <tr>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Category</th>
-                        <th>Memo</th>
-                        <th></th>
 
-                    </tr>
-                    <!--For loop for pulling transactions from db-->
-                    {% for transaction in trans_list %}
-                    <tr>
-                        <td>{{ transaction[9] }}</td>
-                        <!--format date-->
-                        {% if transaction[3][5] == "1" %}
-                            <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                <!-- Dashboard Stats -->
+                <section class="stats">
+                    <div class="stat-box">
+                        <h4>Total Balance</h4>
+                        {% if (total_values[0] | string)[total_values[0] | string | length - 2 ] == "." %}
+                            <p>${{total_values[0]}}0</p>
                         {% else %}
-                            <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                            <p>${{total_values[0]}}</p>
                         {% endif %}
-                        <!--add zero to end of amount if it should end in one-->
-                        {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
-                            <td>${{transaction[1]}}0</td>
-                        {% else %}
-                            <td>${{transaction[1]}}</td>
-                        {% endif %}
-                        <td>{{transaction[2].title()}}</td>
-                        <td>{{transaction[4]}}</td>
-
-                        <!--delete transaction-->
-                        <td>
-                            <button 
-                                class="delete-trans-btn" 
-                                transaction-id="{{ transaction[0] }}">
-                                Delete
-                            </button>
-                        </td>
                         
-
-                    </tr>
-                    {% endfor %}
-                </table>
-            </section>
-
-
-            <!-- Income Table -->
-            <section class="income" id="incomeTable" style="display: none;">
-                <h3>Income</h3>
-                <table>
-                    <tr>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Memo</th>
-                        <th></th>
-                    </tr>
-                    <!--For loop for pulling income from db-->
-                    {% for income in income_list %}
-                    <tr>
-                        <td>{{ income[8] }}</td>
-                        <!--format date-->
-                        {% if income[2][5] == "1" %}
-                            <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                        {% if total_diffs[0] != 0 %}
+                            {% if (total_diffs[0] | string)[total_diffs[0] | string | length - 2 ] == "." %}
+                                <p>{{total_diffs[0]}}0 ({{total_diff_percs[0]}}%)</p>
+                            {% else %}
+                                <p>{{total_diffs[0]}} ({{total_diff_percs[0]}}%)</p>
+                            {% endif %}
                         {% else %}
-                            <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                            <p>-</p>
                         {% endif %}
-                        <!--add zero to end of amount if it should end in one-->
-                        {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
-                            <td>${{income[1]}}0</td>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <h4>Total Expense</h4>
+                        {% if (total_values[1] | string)[total_values[1] | string | length - 2 ] == "." %}
+                            <p>${{total_values[1]}}0</p>
                         {% else %}
-                            <td>${{income[1]}}</td>
+                            <p>${{total_values[1]}}</p>
                         {% endif %}
-                        <td>{{income[3]}}</td>
+                        
+                        {% if total_diffs[1] != 0 %}
+                            {% if (total_diffs[1] | string)[total_diffs[1] | string | length - 2 ] == "." %}
+                                <p>{{total_diffs[1]}}0 ({{total_diff_percs[1]}}%)</p>
+                            {% else %}
+                                <p>{{total_diffs[1]}} ({{total_diff_percs[1]}}%)</p>
+                            {% endif %}
+                        {% else %}
+                            <p>-</p>
+                        {% endif %}
+                        <button class="addIncomeExpense" type="button" id="addExpenseButton" style="display: none; justify-content: center;">Add/View Expenses</button>
+                    </div>
 
-                        <!--delete income-->
-                        <td>
-                            <button 
-                                class="delete-income-btn" 
-                                income-id="{{ income[0] }}">
-                                Delete
-                            </button>
-                        </td>
+                    <div class="stat-box">
+                        <h4>Total Income</h4>
+                        <div class="incomeContainer">
+                            {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
+                                <p>${{total_values[2]}}0</p>
+                            {% else %}
+                                <p>${{total_values[2]}}</p>
+                            {% endif %}
+                        </div>
+                        {% if total_diffs[2] != 0 %}
+                            {% if (total_diffs[2] | string)[total_diffs[2] | string | length - 2 ] == "." %}
+                                <p>{{total_diffs[2]}}0 ({{total_diff_percs[2]}}%)</p>
+                            {% else %}
+                                <p>{{total_diffs[2]}} ({{total_diff_percs[2]}}%)</p>
+                            {% endif %}
+                        {% else %}
+                            <p>-</p>
+                        {% endif %}
+                        <div><button class="addIncomeExpense" type="button" id="addIncomeButton" style="justify-content: center;">Add/View Income</button></div>
+                    </div>
+                    
+                </section>
 
-                    </tr>
-                    {% endfor %}
-                </table>
-            </section>
 
 
-        </main>
+                <!-- Transaction Form -->
+                <section class="transaction-form" id="transactionForm">
+                    <h3>Enter Transaction</h3>
+                    <form id="transForm">
+                        <div>
+                            <label for="date">Date:</label>
+                            <input type="text" id="transDate" name="date" required>
+
+                            <label for="amount">Amount:</label>
+                            <input type="text" id="transAmount" name="amount" required>
+
+                            <label for="memo">Memo:</label>
+                            <input type="text" id="transMemo" name="memo">
+
+                            <!-- category input setup -->
+                            <div id="categoryDropdown">
+                                <label for="category-list">Category:</label>
+                                <select id="category-list" name="category-list">
+                                    {% for category in category_list %}
+                                        <option> {{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div id="categoryInput" style="display: none;">
+                                <label for="add-category">New Category:</label>
+                                <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
+                            </div>
+
+                            <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
+
+                            <button type="button" id="toggleCategoryBtn">Add Category</button>
+                        </div>
+                        
+                        <button type="submit" id="submitTransBtn">Submit</button>
+
+                        <!-- add styling-->
+                        <div id="transactionFeedbackMessage">
+                        </div>
+                    </form>
+                </section>
+                    
+
+                <!-- Income Form -->
+                <section class="income-form" id="incomeForm" style="display: none;">
+                    <h3>Enter Income</h3>
+                        <form id="incomeForm">
+                            <div>
+                                <label for="date">Date:</label>
+                                <input type="text" id="incomeDate" name="date" required>
+
+                                <label for="amount">Amount:</label>
+                                <input type="text" id="incomeAmount" name="amount" required>
+
+                                <label for="memo">Memo:</label>
+                                <input type="text" id="incomeMemo" name="memo">
+
+                                <!-- stay on same month and year -->
+                            </div>
+                            
+                            <button type="submit" id="submitIncomeBtn">Submit</button>
+
+                            <!-- add styling-->
+                            <div id="incomeFeedbackMessage">
+                            </div>
+                            </form>
+                </section>
+
+                
+
+
+                <!-- Transaction Table -->
+                <section class="transactions" id="transactionTable">
+                    <h3>Transactions</h3>
+                    <table>
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Memo</th>
+                            <th></th>
+
+                        </tr>
+                        <!--For loop for pulling transactions from db-->
+                        {% for transaction in trans_list %}
+                        <tr>
+                            <td>{{ transaction[9] }}</td>
+                            <!--format date-->
+                            {% if transaction[3][5] == "1" %}
+                                <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                            {% else %}
+                                <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                            {% endif %}
+                            <!--add zero to end of amount if it should end in one-->
+                            {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
+                                <td>${{transaction[1]}}0</td>
+                            {% else %}
+                                <td>${{transaction[1]}}</td>
+                            {% endif %}
+                            <td>{{transaction[2].title()}}</td>
+                            <td>{{transaction[4]}}</td>
+
+                            <!--delete transaction-->
+                            <td>
+                                <button 
+                                    class="delete-trans-btn" 
+                                    transaction-id="{{ transaction[0] }}">
+                                    Delete
+                                </button>
+                            </td>
+                            
+
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </section>
+
+
+                <!-- Income Table -->
+                <section class="income" id="incomeTable" style="display: none;">
+                    <h3>Income</h3>
+                    <table>
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Memo</th>
+                            <th></th>
+                        </tr>
+                        <!--For loop for pulling income from db-->
+                        {% for income in income_list %}
+                        <tr>
+                            <td>{{ income[8] }}</td>
+                            <!--format date-->
+                            {% if income[2][5] == "1" %}
+                                <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                            {% else %}
+                                <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                            {% endif %}
+                            <!--add zero to end of amount if it should end in one-->
+                            {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
+                                <td>${{income[1]}}0</td>
+                            {% else %}
+                                <td>${{income[1]}}</td>
+                            {% endif %}
+                            <td>{{income[3]}}</td>
+
+                            <!--delete income-->
+                            <td>
+                                <button 
+                                    class="delete-income-btn" 
+                                    income-id="{{ income[0] }}">
+                                    Delete
+                                </button>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </section>
+
+
+            </main>
+        {% endif %}
     </div>
 
 

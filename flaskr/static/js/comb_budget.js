@@ -1,4 +1,7 @@
-const email = document.getElementById('email').value; // Get the email from the input field
+document.getElementById('inviteForm').addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    const email = document.getElementById('email').value; // Get the email from the input field
 
     try {
         // Send the email to the backend
@@ -21,8 +24,6 @@ const email = document.getElementById('email').value; // Get the email from the 
         alert('An error occurred while sending the invitation.');
     }
 });
-
-
 
 // copied over from home.js
 

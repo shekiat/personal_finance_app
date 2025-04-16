@@ -16,6 +16,7 @@ import sqlite3
 import datetime
 import click
 import os
+import boto3
 from dateutil.parser import parse
 
 month_to_int = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12}
@@ -297,10 +298,10 @@ def fetch_group_id(user_id):
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     db_cursor.execute("SELECT GROUP_ID FROM USER_GROUPS WHERE USER_1_ID = %s OR USER_2_ID = %s OR USER_3_ID = %s OR USER_4_ID = %s OR USER_5_ID = %s", (user_id, user_id, user_id, user_id, user_id))
-    group_id_row = db_cursor.fetchall()[0][0]
+    group_id_row = db_cursor.fetchall()
 
     if group_id_row != []:
-        return group_id_row
+        return group_id_row[0][0]
     else:
         return None
     
@@ -614,7 +615,7 @@ def add_user_to_group(creator_id, new_user_email):
     new_user_id, _ = fetch_user_id(new_user_email)
     print(f"new user id: {new_user_id}")
 
-    db_cursor.execute("SELECT GROUP_ID FROM USER_GROUPS WHERE USER_1_ID = %s", creator_id)
+    db_cursor.execute("SELECT * FROM USER_GROUPS WHERE USER_1_ID = %s", (creator_id,))
     group_id_row = db_cursor.fetchall()
     if len(group_id_row) == 0:
         db_cursor.execute("SELECT MAX(group_ID) FROM USER_GROUPS")
@@ -625,15 +626,22 @@ def add_user_to_group(creator_id, new_user_email):
             group_id = 1
         db_cursor.execute("INSERT INTO USER_GROUPS VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id[0], new_user_id))
         print("budget created, user added")
+        db.commit()
+        return 1 # 1 = budget created, user added
     else:
         group_id = group_id_row[0][0]
-        for i in range(3, 6):
+        for i in range(2, 6):
             if group_id_row[0][i] == 0:
                 new_user_number = f"USER_{i}_ID"
-                db_cursor.execute(f"INSERT INTO USER_GROUPS ({new_user_number}) VALUES (%s) WHERE GROUP_ID = %s", (new_user_id, group_id))
-        print("user added to budget")
+                print(new_user_number)
+                db_cursor.execute(f"UPDATE USER_GROUPS SET {new_user_number} = %s WHERE GROUP_ID = %s", (new_user_id, group_id))
+                print("user added to budget")
+                db.commit()
+                return 2 # 2 = successfully added
+            elif group_id_row[0][i] == new_user_id:
+                return 0 # 0 = user already in DB
     
-    db.commit()
+    
 
 
 

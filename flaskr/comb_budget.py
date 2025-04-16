@@ -31,44 +31,55 @@ def invite_user():
     if not email:
         return jsonify({'error': 'Email is required'}), 400
 
+    # Check if the user already exists in Cognito
     try:
-        # Check if the user already exists in Cognito
-        try:
-            cognito_client.admin_get_user(
-                UserPoolId=COGNITO_USER_POOL_ID,
-                Username=email
-            )
-            user_exists = True
-        except cognito_client.exceptions.UserNotFoundException:
-            user_exists = False
+        cognito_client.admin_get_user(
+            UserPoolId=COGNITO_USER_POOL_ID,
+            Username=email
+        )
+        user_exists = True
+    except cognito_client.exceptions.UserNotFoundException:
+        user_exists = False
 
-        if user_exists:
-            # User already exists
-            add_user_to_group(session["user_id"], email)  # Add email to multi-user budget DB
-            send_email(email, link_only=True)  # Send email with link only
-            return jsonify({'message': 'User already exists. Email sent with link only.'}), 200     
+    if session["budget_exists"] == 0:
+        return(redirect("/combined_budget"))
+
+    if user_exists:
+        # User already exists
+        user_added = add_user_to_group(session["user_id"], email)  # Add email to multi-user budget DB
+        if user_added == 0:
+            return jsonify({'message': 'User already in budget'}), 200
+        elif user_added == 1:
+            send_email(email, link_only=True)  # Send email with temp username and password
+            return jsonify({'message': 'Budget created, user added!'}), 200
         else:
-            # Generate a unique username (UUID)
-            temp_username = f"user_{uuid.uuid4().hex[:8]}"  # Generate a short unique username
-            temp_password = 'TemporaryPassword123!'  # Define a temporary password
+            send_email(email, link_only=True)  # Send email with temp username and password
+            return jsonify({'message': 'User added to budget!'}), 200    
+    else:
+        # Generate a unique username (UUID)
+        temp_username = f"user_{uuid.uuid4().hex[:8]}"  # Generate a short unique username
+        temp_password = 'TemporaryPassword123!'  # Define a temporary password
 
-            # Create temporary user in Cognito and send invite
-            cognito_client.admin_create_user(
-                UserPoolId=COGNITO_USER_POOL_ID,
-                Username=temp_username,
-                UserAttributes=[
-                    {'Name': 'email', 'Value': email},
-                    {'Name': 'email_verified', 'Value': 'true'}
-                ],
-                TemporaryPassword=temp_password,  # Set the temporary password
-                MessageAction='SUPPRESS'  # Use 'SUPPRESS' to skip sending the default email
-            )
-            add_user_to_group(email)  # Add email to multi-user budget DB
+        # Create temporary user in Cognito and send invite
+        cognito_client.admin_create_user(
+            UserPoolId=COGNITO_USER_POOL_ID,
+            Username=temp_username,
+            UserAttributes=[
+                {'Name': 'email', 'Value': email},
+                {'Name': 'email_verified', 'Value': 'true'}
+            ],
+            TemporaryPassword=temp_password,  # Set the temporary password
+            MessageAction='SUPPRESS'  # Use 'SUPPRESS' to skip sending the default email
+        )
+        user_added = add_user_to_group(email)  # Add email to multi-user budget DB; 0 = user already in budget, 1 = budget created and added, 2 = added
+        if user_added == 0:
+            return jsonify({'message': 'User already in budget'}), 200
+        elif user_added == 1:
             send_email(email, link_only=False, temp_username=temp_username, temp_password=temp_password)  # Send email with temp username and password
-            return jsonify({'message': 'Temporary user created and email sent.'}), 200
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+            return jsonify({'message': 'Budget created, user added!'}), 200
+        else:
+            send_email(email, link_only=False, temp_username=temp_username, temp_password=temp_password)  # Send email with temp username and password
+            return jsonify({'message': 'User added to budget!'}), 200
     
 def send_email(email, link_only, temp_username=None, temp_password=None):
     # Initialize the SES client using environment variables set in Heroku
@@ -159,46 +170,51 @@ int_to_month = {
 def comb_budget():
     # get group id, set as session variable
     group_id = fetch_group_id(session["user_id"])
-    session["group_id"] = group_id
+    if group_id == None:
+        session["budget_exists"] = 0
+        return render_template("combined_budget.html", budget_exists=0, trans_list=[], income_list=[], total_values=[], total_diffs=[], total_diff_percs=[], category_list=[], year_list=[], current_year=0, current_month=0, current_month_string="", user_name="", user_email="")
+    else:
+        session["budget_exists"] = 1
+        session["group_id"] = group_id
 
-    # get the totals and transactions for current month
-    trans_list = []
-    session['current_group_month'] = datetime.datetime.now().month
-    session['current_group_year'] = datetime.datetime.now().year
+        # get the totals and transactions for current month
+        trans_list = []
+        session['current_group_month'] = datetime.datetime.now().month
+        session['current_group_year'] = datetime.datetime.now().year
 
-    # fetch current and past month totals
-    total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
-    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["group_id"], 1)
-    # calculate differences, percent differences
-    total_diffs = [0, 0, 0]
-    total_diff_percs = [0, 0, 0]
-    if past_month_total_values != (0, 0, 0):
-        total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
-        for i in range(3):
-            if past_month_total_values[i] != 0:
-                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+        # fetch current and past month totals
+        total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
+        past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["group_id"], 1)
+        # calculate differences, percent differences
+        total_diffs = [0, 0, 0]
+        total_diff_percs = [0, 0, 0]
+        if past_month_total_values != (0, 0, 0):
+            total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
+            for i in range(3):
+                if past_month_total_values[i] != 0:
+                    total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
 
-    trans_list = read_transactions(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
-    income_list = read_income(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
-    
-    # format differences for presentation, JS SCRIPT
-    for i in range(3):
-        if total_diffs[i] < 0:
-            total_diffs[i] = "-$" + str(int(total_diffs[i]))[1:]
-        elif total_diffs[i] > 0:
-            total_diffs[i] = "+$" + str(total_diffs[i])
-
-    # get categories for drop down
-    category_list = read_categories(session["group_id"], 1)
-
-    # year list portion, this is fetched from session variable
-
-    # month converted to string
-    if isinstance(session['current_group_month'], int):
-        current_month_string = int_to_month[session['current_group_month']]
+        trans_list = read_transactions(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
+        income_list = read_income(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
         
-    print(income_list)
-    return render_template("combined_budget.html", trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=session["year_list"], current_year = session['current_group_year'], current_month=session["current_group_month"], current_month_string=current_month_string, user_name=session['full_name'], user_email=session['user']['email'])
+        # format differences for presentation, JS SCRIPT
+        for i in range(3):
+            if total_diffs[i] < 0:
+                total_diffs[i] = "-$" + str(int(total_diffs[i]))[1:]
+            elif total_diffs[i] > 0:
+                total_diffs[i] = "+$" + str(total_diffs[i])
+
+        # get categories for drop down
+        category_list = read_categories(session["group_id"], 1)
+
+        # year list portion, this is fetched from session variable
+
+        # month converted to string
+        if isinstance(session['current_group_month'], int):
+            current_month_string = int_to_month[session['current_group_month']]
+            
+        print(income_list)
+        return render_template("combined_budget.html", budget_exists=1, trans_list=trans_list, income_list=income_list, total_values=total_values, total_diffs=total_diffs, total_diff_percs=total_diff_percs, category_list=category_list, year_list=session["year_list"], current_year = session['current_group_year'], current_month=session["current_group_month"], current_month_string=current_month_string, user_name=session['full_name'], user_email=session['user']['email'])
     
 @bp.route('/api/group-submit-transaction', methods=['POST'])
 def group_submit():
