@@ -358,7 +358,6 @@ def read_transactions(month, year, id, user_group=0):
     else:
         db_cursor.execute("SELECT * FROM GROUP_TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND GROUP_ID = %s ORDER BY TRANS_DATE DESC", (month, year, id)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
 
-    db_cursor.execute("SELECT * FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY TRANS_DATE DESC", (month, year, user_id)) # (TRANS_ID, TRANS_AMOUNT, TRANS_CATEGORY, TRANS_DATE, TRANS_MEMO)
 
     trans_list_res = db_cursor.fetchall()
     trans_list = []
@@ -435,7 +434,6 @@ def read_income(month, year, id, user_group=0):
     else:
         db_cursor.execute("SELECT * FROM GROUP_INCOME WHERE MONTH = %s AND YEAR = %s AND GROUP_ID = %s ORDER BY INCOME_DATE DESC", (month, year, id)) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
 
-    db_cursor.execute("SELECT * FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s ORDER BY INCOME_DATE DESC", (month, year, user_id)) # (INCOME_ID, INCOME_AMOUNT, INCOME_CATEGORY, INCOME_DATE, INCOME_MEMO, MONTH, YEAR)
     income_list_res = db_cursor.fetchall()
     income_list = []
 
@@ -540,7 +538,6 @@ def read_month_totals(month, year, id, user_group=0):
     else:
         db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM GROUP_TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND GROUP_ID = %s", (month, year, id))
 
-    db_cursor.execute("SELECT SUM(TRANS_AMOUNT) FROM TRANSACTIONS WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
     expense_row = db_cursor.fetchone()[0]
     if expense_row != None:
         expense_total = float(expense_row)
@@ -552,7 +549,6 @@ def read_month_totals(month, year, id, user_group=0):
     else:
         db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM GROUP_INCOME WHERE MONTH = %s AND YEAR = %s AND GROUP_ID = %s", (month, year, id))
 
-    db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, user_id))
     income_row = db_cursor.fetchone()[0]
     if  income_row != None:
         income_total = float(income_row)
@@ -574,7 +570,6 @@ def read_categories(id, user_group=0):
     else:
         db_cursor.execute("SELECT DISTINCT TRANS_CATEGORY FROM GROUP_TRANSACTIONS WHERE GROUP_ID = %s ORDER BY TRANS_CATEGORY", (id,))
 
-    db_cursor.execute("SELECT DISTINCT TRANS_CATEGORY FROM TRANSACTIONS WHERE USER_ID = %s ORDER BY TRANS_CATEGORY", (user_id,))
     categories = [row[0] for row in db_cursor.fetchall()]
 
     return categories
