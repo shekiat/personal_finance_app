@@ -1,7 +1,4 @@
-document.getElementById('inviteForm').addEventListener('submit', async (event) => {
-    event.preventDefault(); // Prevent default form submission
-
-    const email = document.getElementById('email').value; // Get the email from the input field
+const email = document.getElementById('email').value; // Get the email from the input field
 
     try {
         // Send the email to the backend

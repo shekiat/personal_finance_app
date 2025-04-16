@@ -138,8 +138,6 @@ def send_email(email, link_only, temp_username=None, temp_password=None):
     except Exception as e:
         print(f"Error sending email to {email}: {e}")
 
-
-
 # copy over home.py functionality
 
 int_to_month = {
@@ -345,3 +343,37 @@ def group_update_transaction_table():
 def group_update_income_table():
     income_list = read_income(session["current_group_month"], session["current_group_year"], session["group_id"], 1)
     return jsonify({"income_list": income_list})
+  
+# call group chat functions from db.py
+@bp.route('/api/send-message', methods=['POST'])
+def send_message():
+    """Handle sending a message to the group chat."""
+    data = request.get_json()
+    message = data.get('message')
+    user_id = session.get('user_id')  
+    group_id = session.get('group_id')  
+
+    if not message:
+        return jsonify({'success': False, 'error': 'Message cannot be empty'}), 400
+
+    try:
+        insert_group_message(group_id, user_id, message)
+        return jsonify({'success': True, 'message': 'Message sent successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@bp.route('/api/get-messages', methods=['GET'])
+def get_messages():
+    """Handle fetching messages for the group chat."""
+    group_id = session.get('group_id')  
+
+    try:
+        messages = fetch_group_messages(group_id)
+        formatted_messages = [
+            {'user': row['username'], 'message': row['message'], 'timestamp': row['timestamp']}
+            for row in messages
+        ]
+        return jsonify({'success': True, 'messages': formatted_messages})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
