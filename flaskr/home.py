@@ -433,7 +433,7 @@ def delete():
     # session['chosen_month'] = int(data.get('month'))
     # session['chosen_year'] = int(data.get('year'))
 
-    delete_transaction(transaction_id, session["user_id"])
+    delete_transaction(transaction_id)
 
     return jsonify({'success' : True})
 
@@ -446,7 +446,7 @@ def delete_inc():
     # session['chosen_month'] = int(request.form['month'])
     # session['chosen_year'] = int(request.form['year'])
 
-    delete_income(income_id, session["user_id"])
+    delete_income(income_id)
 
     # Feedback that transaction has been deleted?
 

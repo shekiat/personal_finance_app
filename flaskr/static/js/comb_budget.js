@@ -267,7 +267,7 @@ function updateTransactionTable(transactions) {
 
         const row = `
             <tr>
-                <td>Jim Gorden</td>
+                <td>${transaction[9]}</td>
                 <td>${formattedDate}</td>
                 <td>${formattedAmount}</td>
                 <td>${capitalizedCategory}</td>
@@ -399,7 +399,7 @@ function updateIncomeTable(income) {
 
         const row = `
             <tr>
-                <td>Jim Gorden</td>
+                <td>${income[8]}</td>
                 <td>${formattedDate}</td>
                 <td>${formattedAmount}</td>
                 <td>${income[3]}</td>
