@@ -40,21 +40,24 @@ def invite_user():
         user_exists = True
     except cognito_client.exceptions.UserNotFoundException:
         user_exists = False
-
+        
     if session["budget_exists"] == 0:
-        return(redirect("/combined_budget"))
+        session["budget_exists"] = 1
+        budget_created = True
+    else:
+        budget_created = False
 
     if user_exists:
         # User already exists
         user_added = add_user_to_group(session["user_id"], email)  # Add email to multi-user budget DB
         if user_added == 0:
-            return jsonify({'message': 'User already in budget'}), 200
+            return jsonify({'message': 'User already in budget', 'budget_created': budget_created}), 200
         elif user_added == 1:
             send_email(email, link_only=True)  # Send email with temp username and password
-            return jsonify({'message': 'Budget created, user added!'}), 200
+            return jsonify({'message': 'Budget created, user added!', 'budget_created': budget_created}), 200
         else:
             send_email(email, link_only=True)  # Send email with temp username and password
-            return jsonify({'message': 'User added to budget!'}), 200    
+            return jsonify({'message': 'User added to budget!', 'budget_created': budget_created}), 200    
     else:
         # Generate a unique username (UUID)
         temp_username = f"user_{uuid.uuid4().hex[:8]}"  # Generate a short unique username
@@ -73,13 +76,13 @@ def invite_user():
         )
         user_added = add_user_to_group(email)  # Add email to multi-user budget DB; 0 = user already in budget, 1 = budget created and added, 2 = added
         if user_added == 0:
-            return jsonify({'message': 'User already in budget'}), 200
+            return jsonify({'message': 'User already in budget', 'budget_created': budget_created}), 200
         elif user_added == 1:
             send_email(email, link_only=False, temp_username=temp_username, temp_password=temp_password)  # Send email with temp username and password
-            return jsonify({'message': 'Budget created, user added!'}), 200
+            return jsonify({'message': 'Budget created, user added!', 'budget_created': budget_created}), 200
         else:
             send_email(email, link_only=False, temp_username=temp_username, temp_password=temp_password)  # Send email with temp username and password
-            return jsonify({'message': 'User added to budget!'}), 200
+            return jsonify({'message': 'User added to budget!', 'budget_created': budget_created}), 200
     
 def send_email(email, link_only, temp_username=None, temp_password=None):
     # Initialize the SES client using environment variables set in Heroku

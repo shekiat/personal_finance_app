@@ -624,7 +624,7 @@ def add_user_to_group(creator_id, new_user_email):
             group_id = group_id_row + 1
         else:
             group_id = 1
-        db_cursor.execute("INSERT INTO USER_GROUPS VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id[0], new_user_id))
+        db_cursor.execute("INSERT INTO USER_GROUPS VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id, new_user_id))
         print("budget created, user added")
         db.commit()
         return 1 # 1 = budget created, user added

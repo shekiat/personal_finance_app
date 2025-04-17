@@ -11,11 +11,12 @@ document.getElementById('inviteForm').addEventListener('submit', async (event) =
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email }) // Send the email as JSON
-        });
-
+        })
         const result = await response.json();
         if (response.ok) {
+            document.getElementById('email').value = ""
             alert(result.message); // Show success message
+            window.location.href = "/combined_budget";
         } else {
             alert('Error: ' + result.error); // Show error message
         }
