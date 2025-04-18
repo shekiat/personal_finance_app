@@ -254,8 +254,6 @@
 
                                 <label for="memo">Memo:</label>
                                 <input type="text" id="incomeMemo" name="memo">
-
-                                <!-- stay on same month and year -->
                             </div>
                             
                             <button type="submit" id="submitIncomeBtn">Submit</button>
@@ -280,26 +278,32 @@
                             <th>Category</th>
                             <th>Memo</th>
                             <th></th>
+                            <th></th>
 
                         </tr>
                         <!--For loop for pulling transactions from db-->
                         {% for transaction in trans_list %}
                         <tr>
-                            <td>{{ transaction[9] }}</td>
-                            <!--format date-->
+                            <!-- Set transaction date -->
                             {% if transaction[3][5] == "1" %}
-                                <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                                {% set formatted_date = transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4] %}
                             {% else %}
-                                <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                                {% set formatted_date = transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4] %}
                             {% endif %}
-                            <!--add zero to end of amount if it should end in one-->
-                            {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
-                                <td>${{transaction[1]}}0</td>
+
+                            <!-- Set transaction amount -->
+                            {% if (transaction[1] | string)[(transaction[1] | string | length) - 2] == "." %}
+                                {% set formatted_amount = transaction[1] ~ "0" %}
                             {% else %}
-                                <td>${{transaction[1]}}</td>
+                                {% set formatted_amount = transaction[1] %}
                             {% endif %}
-                            <td>{{transaction[2].title()}}</td>
-                            <td>{{transaction[4]}}</td>
+
+                            <!-- Output table cells -->
+                            <td>{{ transaction[9] }}</td>
+                            <td>{{ formatted_date }}</td>
+                            <td>${{ formatted_amount }}</td>
+                            <td>{{ transaction[2].title() }}</td>
+                            <td>{{ transaction[4] }}</td>
 
                             <!--delete transaction-->
                             <td>
@@ -309,7 +313,17 @@
                                     Delete
                                 </button>
                             </td>
-                            
+
+                            <!--push to chat box-->
+                            <td>
+                                <button 
+                                    class="trans-chat-btn" 
+                                    transaction-amount="{{ formatted_amount }}"
+                                    transaction-date="{{ formatted_date }}"
+                                    transaction-category="{{ transaction[2].title() }}">
+                                    >
+                                </button>
+                            </td>
 
                         </tr>
                         {% endfor %}
@@ -327,23 +341,27 @@
                             <th>Amount</th>
                             <th>Memo</th>
                             <th></th>
+                            <th></th>
                         </tr>
                         <!--For loop for pulling income from db-->
                         {% for income in income_list %}
                         <tr>
-                            <td>{{ income[8] }}</td>
                             <!--format date-->
                             {% if income[2][5] == "1" %}
-                                <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                                {% set formatted_date = income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4] %}
                             {% else %}
-                                <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
-                            {% endif %}
+                                {% set formatted_date = income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4] %}                            {% endif %}
+
                             <!--add zero to end of amount if it should end in one-->
                             {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
-                                <td>${{income[1]}}0</td>
+                                {% set formatted_amount = income[1] ~ "0" %}
                             {% else %}
-                                <td>${{income[1]}}</td>
+                                {% set formatted_amount = income[1] %}
                             {% endif %}
+
+                            <td>{{ income[8] }}</td>
+                            <td>{{ formatted_date }}</td>
+                            <td>${{ formatted_amount }}</td>
                             <td>{{income[3]}}</td>
 
                             <!--delete income-->
@@ -352,6 +370,17 @@
                                     class="delete-income-btn" 
                                     income-id="{{ income[0] }}">
                                     Delete
+                                </button>
+                            </td>
+
+                            <!--push to chat box-->
+                            <td>
+                                <button 
+                                    class="income-chat-btn" 
+                                    income-id="{{ income[0] }}"
+                                    income-amount="{{ formatted_amount }}"
+                                    income-date="{{ formatted_date }}">
+                                    >
                                 </button>
                             </td>
 
