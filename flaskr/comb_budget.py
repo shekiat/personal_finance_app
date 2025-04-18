@@ -389,10 +389,21 @@ def get_messages():
 
     try:
         messages = fetch_group_messages(group_id)
-        formatted_messages = [
-            {'user': row['username'], 'message': row['message'], 'timestamp': row['timestamp']}
-            for row in messages
-        ]
+        formatted_messages = []
+        for row in messages:
+            # Convert the timestamp to EST
+            timestamp = row['timestamp']
+            if timestamp:
+                localized_timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(EST)
+                formatted_timestamp = localized_timestamp.strftime('%Y-%m-%d %I:%M %p')  # Format as desired
+            else:
+                formatted_timestamp = None
+
+            formatted_messages.append({
+                'user': row['username'],
+                'message': row['message'],
+                'timestamp': formatted_timestamp
+            })
         return jsonify({'success': True, 'messages': formatted_messages})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
