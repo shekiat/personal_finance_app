@@ -26,33 +26,40 @@ document.getElementById('inviteForm').addEventListener('submit', async (event) =
     }
 });
 
+
+
+
 // attach chat listeners on transaction entries
 function attachTransChatListeners() {
     document.querySelectorAll('.trans-chat-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             console.log("transaction chat button hit");
             const transactionId = event.target.getAttribute('transaction-id');
-            const 
-            fetch('/api/chat-transaction', {
-              body: JSON.stringify({
-                    transaction_id: transactionId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const transContainer = document.createElement("div");
-                    // transContainer.classList.add("message-box"); // for styling
+            const transactionDate = event.target.getAttribute('transaction-date');
+            const transactionCategory = event.target.getAttribute('transaction-category');
             
-                    transContainer.innerHTML = `
-                    <div class="message-header">${data.title}</div>
-                    <div class="message-body">${data.content}</div>
-                    <div class="message-time">${data.time}</div>
-                    `;
+            addMessageToChat(user_name, '[t]' + transactionId + '\n' + transactionDate + '\n' + transactionCategory);
+
+            // fetch('/api/chat-transaction', {
+            //   body: JSON.stringify({
+            //         transaction_id: transactionId
+            //     })
+            // })
+            // .then(response => response.json())
+            // .then(data => {
+            //     if (data.success) {
+            //         const transContainer = document.createElement("div");
+            //         // transContainer.classList.add("message-box"); // for styling
             
-                    document.querySelector("#chat-box").appendChild(transContainer);
-                }
-            });
+            //         transContainer.innerHTML = `
+            //         <div class="message-header">${data.title}</div>
+            //         <div class="message-body">${data.content}</div>
+            //         <div class="message-time">${data.time}</div>
+            //         `;
+            
+            //         document.querySelector("#chat-box").appendChild(transContainer);
+            //     }
+            // });
         });
     });
 }
@@ -91,8 +98,10 @@ function attachIncomeChatListeners() {
     });
 }
 
-// group chat functionality
 
+
+
+// group chat functionality
 document.getElementById('chatForm').addEventListener('submit', async (event) => {
     event.preventDefault();
 
@@ -100,8 +109,11 @@ document.getElementById('chatForm').addEventListener('submit', async (event) => 
     const message = chatInput.value.trim();
 
     if (message) {
+        // Clear the input field
+        chatInput.value = '';
+
         // Display the message in the chat box
-        addMessageToChat('You', message);
+        addMessageToChat(user_name, message);
 
         // Send the message to the server
         try {
@@ -120,9 +132,6 @@ document.getElementById('chatForm').addEventListener('submit', async (event) => 
         } catch (error) {
             console.error('Error sending message:', error);
         }
-
-        // Clear the input field
-        chatInput.value = '';
     }
 });
 
@@ -131,7 +140,15 @@ function addMessageToChat(user, message, timestamp) {
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = user === 'You' ? 'my-message' : 'user-message';
-    messageDiv.textContent = `${user}: ${message} (${timestamp})`;
+    console.log(message)
+    if (message.slice(0, 3) == "[t]") {
+        
+        messageDiv.textContent = `${user}: ${message.slice(3)} \n(${timestamp})`;
+    }
+    else {
+        messageDiv.textContent = `${user}: ${message} (${timestamp})`;
+    }
+    messageDiv.style.marginBottom = '5px';
     chatMessages.appendChild(messageDiv);
 
     // Scroll to the bottom of the chat box
@@ -140,9 +157,12 @@ function addMessageToChat(user, message, timestamp) {
 
 // Function to fetch and display new messages
 async function fetchMessages() {
+    console.log("fetching messages")
     try {
         const response = await fetch('/api/get-messages');
         const result = await response.json();
+
+        const scrollOffsetFromBottom = chatMessages.scrollHeight - chatMessages.scrollTop; // calculate scrolled to position
 
         if (result.success) {
             const chatMessages = document.getElementById('chatMessages');
@@ -151,6 +171,8 @@ async function fetchMessages() {
             result.messages.forEach((msg) => {
                 addMessageToChat(msg.user, msg.message);
             });
+
+            chatMessages.scrollTop = chatMessages.scrollHeight - scrollOffsetFromBottom; // restore scrolled to position
         }
     } catch (error) {
         console.error('Error fetching messages:', error);
@@ -163,8 +185,6 @@ window.onload = fetchMessages;
 // Poll for new messages every 5 seconds
 setInterval(fetchMessages, 5000);
 
-// Initial fetch of messages
-fetchMessages();
 
 // copied over from home.js
 

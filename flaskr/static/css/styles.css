@@ -86,12 +86,6 @@ body {
     justify-content: center;
 }
 
-/* ----- Combined Budget Styling ------ */
-.combined_budget-body {
-    text-align: center;
-    padding: 80px;
-}
-
 
 .content {
     flex: 1;
@@ -342,7 +336,8 @@ header {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 80px;
+    text-align: center;
 }
 
 .combined-budget-body button {
@@ -353,7 +348,6 @@ header {
     border: none;
     font-size: 16px;
     font-weight: 500;
-   
 }
 
 
@@ -361,6 +355,12 @@ header {
     color: white;
     background-color: #128300;
    
+}
+
+#combined-budget-container {
+    display: grid;
+    grid-template-columns: 3fr 1fr; /* two equal sections */
+    gap: 1rem;
 }
 
 .group-transactions {
@@ -459,24 +459,36 @@ header {
     justify-content: space-between;
     z-index: 1000;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    margin-top: 95px;
+    height: 80vh; /* Full height */
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-y: scroll;
+    margin-right: 5px;
 }
 
-.group-chat h2 {
-    margin: 0;
-    padding: 10px;
+.group-chat-header {
+    margin-top: 0px;
+    padding: 1rem;
     background-color: #0053ac;
     color: white;
     text-align: center;
     border-radius: 8px 8px 0 0;
+    position: sticky;
+    margin-bottom: 5px;
 }
 
-.chat-messages {
+#chatMessages {
     flex: 1;
     padding: 10px;
-    overflow-y: auto; /* Enable vertical scrolling */
-    background-color: #fff;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
+    overflow-y: scroll; 
+    scrollbar-width: none;     
+    -ms-overflow-style: none;     
+}
+
+#chatMessages::-webkit-scrollbar {
+    display: none;
 }
 
 .chat-messages div {

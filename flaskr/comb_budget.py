@@ -387,23 +387,22 @@ def get_messages():
     """Handle fetching messages for the group chat."""
     group_id = session.get('group_id')  
 
-    try:
-        messages = fetch_group_messages(group_id)
-        formatted_messages = []
-        for row in messages:
-            # Convert the timestamp to EST
-            timestamp = row['timestamp']
-            if timestamp:
-                localized_timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(EST)
-                formatted_timestamp = localized_timestamp.strftime('%Y-%m-%d %I:%M %p')  # Format as desired
-            else:
-                formatted_timestamp = None
+    messages = fetch_group_messages(group_id)
+    print(f"messages from db: {messages}")
+    formatted_messages = []
+    for row in messages:
+        # Convert the timestamp to EST
+        timestamp = row['timestamp']
+        if timestamp:
+            localized_timestamp = timestamp.replace(tzinfo=pytz.UTC).astimezone(EST)
+            formatted_timestamp = localized_timestamp.strftime('%Y-%m-%d %I:%M %p')  # Format as desired
+        else:
+            formatted_timestamp = None
 
-            formatted_messages.append({
-                'user': row['username'],
-                'message': row['message'],
-                'timestamp': formatted_timestamp
-            })
-        return jsonify({'success': True, 'messages': formatted_messages})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        formatted_messages.append({
+            'user': row['name'],
+            'message': row['message'],
+            'timestamp': formatted_timestamp
+        })
+    return jsonify({'success': True, 'messages': formatted_messages})
+
