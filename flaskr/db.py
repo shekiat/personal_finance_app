@@ -8,6 +8,12 @@ from dateutil.parser import parse
 import psycopg2
 import psycopg2.extras
 
+
+import pytz
+EST = pytz.timezone("US/Eastern")
+
+
+
 month_to_int = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12}
 
 
@@ -668,6 +674,11 @@ def insert_group_message(group_id, user_id, message):
     """Insert a new message into the GROUP_CHAT table."""
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    
+    # Get the current time in UTC
+    utc_now = datetime.datetime.now(tz=pytz.UTC)
+
+    
     db_cursor.execute(
         "INSERT INTO GROUP_CHAT (group_id, user_id, message) VALUES (%s, %s, %s)",
         (group_id, user_id, message)

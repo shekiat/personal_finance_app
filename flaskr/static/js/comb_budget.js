@@ -127,11 +127,11 @@ document.getElementById('chatForm').addEventListener('submit', async (event) => 
 });
 
 // Function to add a message to the chat box
-function addMessageToChat(user, message) {
+function addMessageToChat(user, message, timestamp) {
     const chatMessages = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = user === 'You' ? 'my-message' : 'user-message';
-    messageDiv.textContent = `${user}: ${message}`;
+    messageDiv.textContent = `${user}: ${message} (${timestamp})`;
     chatMessages.appendChild(messageDiv);
 
     // Scroll to the bottom of the chat box
@@ -156,6 +156,9 @@ async function fetchMessages() {
         console.error('Error fetching messages:', error);
     }
 }
+
+// Call fetchMessages when the page loads
+window.onload = fetchMessages;
 
 // Poll for new messages every 5 seconds
 setInterval(fetchMessages, 5000);
