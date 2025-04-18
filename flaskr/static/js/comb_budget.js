@@ -26,6 +26,75 @@ document.getElementById('inviteForm').addEventListener('submit', async (event) =
     }
 });
 
+// attach chat listeners on transaction entries
+function attachTransChatListeners() {
+    document.querySelectorAll('.trans-chat-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log("transaction chat button hit");
+            const transactionId = event.target.getAttribute('transaction-id');
+            const 
+            fetch('/api/chat-transaction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    transaction_id: transactionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const transContainer = document.createElement("div");
+                    // transContainer.classList.add("message-box"); // for styling
+            
+                    transContainer.innerHTML = `
+                    <div class="message-header">${data.title}</div>
+                    <div class="message-body">${data.content}</div>
+                    <div class="message-time">${data.time}</div>
+                    `;
+            
+                    document.querySelector("#chat-box").appendChild(transContainer);
+                }
+            });
+        });
+    });
+}
+
+// attach chat listeners on transaction entries
+function attachIncomeChatListeners() {
+    document.querySelectorAll('.income-chat-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log("income chat button hit");
+            const incomeId = event.target.getAttribute('income-id');
+            fetch('/api/chat-income', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    transaction_id: incomeId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const incomeContainer = document.createElement("div");
+                    // transContainer.classList.add("message-box"); // for styling
+            
+                    incomeContainer.innerHTML = `
+                    <div class="message-header">${data.title}</div>
+                    <div class="message-body">${data.content}</div>
+                    <div class="message-time">${data.time}</div>
+                    `;
+            
+                    document.querySelector("#chat-box").appendChild(incomeContainer);
+                }
+            });
+        });
+    });
+}
+
 // copied over from home.js
 
 // Displays past and future years in the year select dropdown
