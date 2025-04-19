@@ -687,12 +687,11 @@ def insert_group_message(group_id, user_id, message):
     db_cursor.close()
 
 
-def fetch_group_messages(group_id, limit=50):
+def fetch_group_messages(group_id, limit=500):
     """Fetch the latest messages for a group."""
     db = get_db()
     db_cursor = db.cursor(cursor_factory=psycopg2.extras.DictCursor)
     db_cursor.execute("SELECT u.name, gc.message, gc.timestamp FROM GROUP_CHAT gc JOIN USERS u ON gc.user_id = u.user_id WHERE gc.group_id = %s ORDER BY gc.timestamp LIMIT %s", (group_id, limit))
     messages = db_cursor.fetchall()
-    print(f"messages in db: {messages}")
     db_cursor.close()
     return messages

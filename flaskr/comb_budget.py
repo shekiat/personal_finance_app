@@ -174,6 +174,7 @@ def comb_budget():
     # get group id, set as session variable
     group_id = fetch_group_id(session["user_id"])
     if group_id == None:
+        session["group_id"] = None
         session["budget_exists"] = 0
         return render_template("combined_budget.html", budget_exists=0, trans_list=[], income_list=[], total_values=[], total_diffs=[], total_diff_percs=[], category_list=[], year_list=[], current_year=0, current_month=0, current_month_string="", user_name="", user_email="")
     else:
@@ -385,10 +386,9 @@ def send_message():
 @bp.route('/api/get-messages', methods=['GET'])
 def get_messages():
     """Handle fetching messages for the group chat."""
-    group_id = session.get('group_id')  
-
+    group_id = session["group_id"]
+    print(f"group id at message fetch: {group_id}")
     messages = fetch_group_messages(group_id)
-    print(f"messages from db: {messages}")
     formatted_messages = []
     for row in messages:
         # Convert the timestamp to EST

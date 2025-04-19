@@ -50,24 +50,35 @@
     <script>
         var user_name = "{{ user_name }}";
     </script>
-    <div id="combined-budget-container">
+    <div id="combined-budget-container" class="{% if budget_exists == 0 %}budget-mode{% endif %}">
         <div class="combined-budget-body">
-            <h1>Combined Budget</h1>
-
-            <section id="budgetForm"> 
-
-                <form id="inviteForm">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" placeholder="Enter email" required>
-                    <button type="submit">Send Invitation</button>
-                </form>
-            </section>
-
             {% if budget_exists == 0 %}
-            <body></body>
+            <div class="budget-form">
+                <h1>Combined Budget</h1>
+
+                <section id="budgetForm"> 
+
+                    <form id="inviteForm">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" placeholder="Enter email" required>
+                        <button type="submit">Send Invitation</button>
+                    </form>
+                </section>
+            </div>
             {% else %}
                 <!-- Main Content -->
                 <main class="content">
+                    <h1>Combined Budget</h1>
+
+                    <section class="budget-form" id="budgetForm"> 
+
+                        <form id="inviteForm">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" placeholder="Enter email" required>
+                            <button type="submit">Send Invitation</button>
+                        </form>
+                    </section>
+
                     <h3 id="monthYearHeader">{{ current_month_string }} {{ current_year }}</h3>
                     <body>
                         <button id="toggleBtn">Change Month/Year</button>
@@ -312,9 +323,11 @@
                                 <td>
                                     <button 
                                         class="trans-chat-btn" 
+                                        transaction-name="{{ transaction[9] }}"
                                         transaction-amount="{{ formatted_amount }}"
                                         transaction-date="{{ formatted_date }}"
-                                        transaction-category="{{ transaction[2].title() }}">
+                                        transaction-category="{{ transaction[2].title() }}"
+                                        transaction-memo = "{{ transaction[4] }}">
                                         >
                                     </button>
                                 </td>
@@ -371,9 +384,10 @@
                                 <td>
                                     <button 
                                         class="income-chat-btn" 
-                                        income-id="{{ income[0] }}"
+                                        income-name="{{ income[8] }}"
                                         income-amount="{{ formatted_amount }}"
-                                        income-date="{{ formatted_date }}">
+                                        income-date="{{ formatted_date }}"
+                                        income-memo = "{{ income[3] }}">
                                         >
                                     </button>
                                 </td>
@@ -383,21 +397,22 @@
                         </table>
                     </section>
 
+                    </div>
+                    <div id="group-chat">
+                        <!---- Group Chat ----->
+                        <section class="group-chat" id="groupChat">
+                            <h2 class="group-chat-header">Group Chat</h2>
+                            <div id="chatMessages"></div>
+                            <form id="chatForm">
+                                <input type="text" id="chatInput" placeholder="Type your message here..." required>
+                                <button type="submit">Send</button>
+                            </form>
+                        </section>
+                    </div>
+
 
                 </main>
             {% endif %}
-        </div>
-        <div id="group-chat">
-            <!---- Group Chat ----->
-            <section class="group-chat" id="groupChat">
-                <h2 class="group-chat-header">Group Chat</h2>
-                <div id="chatMessages"></div>
-                <form id="chatForm">
-                    <input type="text" id="chatInput" placeholder="Type your message here..." required>
-                    <button type="submit">Send</button>
-                </form>
-            </section>
-        </div>
     </div>
 
 

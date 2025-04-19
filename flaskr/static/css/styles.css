@@ -330,7 +330,10 @@ header {
 
 
 /* Combined Budget page styling */
-
+.budget-form {
+    text-align: center;
+    justify-content: center;
+}
 .combined-budget-body {
     display: flex;
     flex-direction: column;
@@ -361,6 +364,14 @@ header {
     display: grid;
     grid-template-columns: 3fr 1fr; /* two equal sections */
     gap: 1rem;
+}
+
+#combined-budget-container.budget-mode {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
+    grid-template-columns: none;
 }
 
 .group-transactions {
@@ -531,7 +542,7 @@ header {
 }
 
 #chatForm button:hover {
-    background-color: #0056b3;
+    background-color: #101214;
 }
 
 /* End of Combined Budget page styling */
