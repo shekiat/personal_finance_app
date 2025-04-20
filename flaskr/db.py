@@ -621,7 +621,7 @@ def add_user_to_group(creator_id, new_user_email):
     new_user_id, _ = fetch_user_id(new_user_email)
     print(f"new user id: {new_user_id}")
 
-    db_cursor.execute("SELECT * FROM USER_GROUPS WHERE USER_1_ID = %s", (creator_id,))
+    db_cursor.execute("SELECT * FROM USER_GROUPS WHERE USER_1_ID = %s  OR USER_2_ID = %s OR USER_3_ID = %s OR USER_4_ID = %s OR USER_5_ID = %s", (creator_id, creator_id, creator_id, creator_id, creator_id))
     group_id_row = db_cursor.fetchall()
     if len(group_id_row) == 0:
         db_cursor.execute("SELECT MAX(group_ID) FROM USER_GROUPS")
@@ -631,7 +631,7 @@ def add_user_to_group(creator_id, new_user_email):
         else:
             group_id = 1
         db_cursor.execute("INSERT INTO USER_GROUPS VALUES (%s, %s, %s, 0, 0, 0)", (group_id, creator_id, new_user_id))
-        print("budget created, user added")
+        print("budget created, user invited")
         db.commit()
         return 1 # 1 = budget created, user added
     else:
@@ -641,7 +641,7 @@ def add_user_to_group(creator_id, new_user_email):
                 new_user_number = f"USER_{i}_ID"
                 print(new_user_number)
                 db_cursor.execute(f"UPDATE USER_GROUPS SET {new_user_number} = %s WHERE GROUP_ID = %s", (new_user_id, group_id))
-                print("user added to budget")
+                print("user invited to budget")
                 db.commit()
                 return 2 # 2 = successfully added
             elif group_id_row[0][i] == new_user_id:

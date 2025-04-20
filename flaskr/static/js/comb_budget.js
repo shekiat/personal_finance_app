@@ -50,8 +50,6 @@ function attachTransChatListeners() {
             }
 
             message = '[t]' + message;
-
-            addMessageToChat(user_name, message);
             
             // Send the message to the server
             try {
@@ -66,6 +64,9 @@ function attachTransChatListeners() {
                 const result = response.json();
                 if (!result.success) {
                     console.error('Failed to send message:', result.error);
+                }
+                else {
+                    addMessageToChat(user_name, message);
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -92,7 +93,6 @@ function attachIncomeChatListeners() {
                 message = message + '<br>"' + incomeMemo + '"';
             }
             message = '[i]' + message;
-            addMessageToChat(user_name, message);
 
             // Send the message to the server
             try {
@@ -107,6 +107,9 @@ function attachIncomeChatListeners() {
                 const result = response.json();
                 if (!result.success) {
                     console.error('Failed to send message:', result.error);
+                }
+                else { 
+                    addMessageToChat(user_name, message);
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -129,9 +132,6 @@ document.getElementById('chatForm').addEventListener('submit', async (event) => 
         // Clear the input field
         chatInput.value = '';
 
-        // Display the message in the chat box
-        addMessageToChat(user_name, message);
-
         // Send the message to the server
         try {
             const response = await fetch('/api/send-message', {
@@ -146,6 +146,10 @@ document.getElementById('chatForm').addEventListener('submit', async (event) => 
             if (!result.success) {
                 console.error('Failed to send message:', result.error);
             }
+            else {
+                // display message in chat box
+                addMessageToChat(user_name, message);
+            }
         } catch (error) {
             console.error('Error sending message:', error);
         }
@@ -158,7 +162,6 @@ function addMessageToChat(user, message, timestamp) {
     const messageDiv = document.createElement('div');
     messageDiv.className = user === 'You' ? 'my-message' : 'user-message';
     if (message.slice(0, 3) == "[t]") {
-        console.log(message)
         messageDiv.innerHTML = `${user}:`;
         const transDiv = document.createElement('div');
         transDiv.innerHTML = `${message.slice(3)} <br>`;
@@ -169,7 +172,6 @@ function addMessageToChat(user, message, timestamp) {
         chatMessages.appendChild(transDiv);
     }
     else if (message.slice(0, 3) == "[i]") {
-        console.log(message)
         messageDiv.innerHTML = `${user}:`;
         const transDiv = document.createElement('div');
         transDiv.innerHTML = `${message.slice(3)} <br>`;
@@ -201,11 +203,22 @@ async function fetchMessages() {
 
         if (result.success) {
             const chatMessages = document.getElementById('chatMessages');
+            const messages = Array.from(chatMessages.children);
+            const lastFiveMessagesOnPage = messages.slice(-5);
+            const lastFiveMessagesFromDB = result.messages.slice(-5);
             chatMessages.innerHTML = ''; // Clear existing messages
 
             result.messages.forEach((msg) => {
                 addMessageToChat(msg.user, msg.message);
             });
+
+            for (let i = 4; i >= 0; i--) {
+                console.log(lastFiveMessagesOnPage[i]);
+                console.log(lastFiveMessagesFromDB[i]);
+                if (lastFiveMessagesOnPage[i] != lastFiveMessagesFromDB[i]) {
+                    addMessageToChat(lastFiveMessagesOnPage[i].user, lastFiveMessagesOnPage[i].message);
+                }
+            }
 
             chatMessages.scrollTop = chatMessages.scrollHeight - scrollOffsetFromBottom; // restore scrolled to position
         }
