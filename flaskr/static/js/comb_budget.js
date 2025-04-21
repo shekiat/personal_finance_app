@@ -435,6 +435,12 @@ submitTransBtn.addEventListener("click", function() {
                 document.getElementById("hidden-category").value = ""
                 // hide category inpiut, display dropdown
 
+                if (dropdown.style.display === "none") {
+                    dropdown.style.display = "block";
+                    input.style.display = "none";
+                    button.textContent = "Add Category";
+                }
+
                 updateStats();
                 fetchUpdatedTransactions();
             }
