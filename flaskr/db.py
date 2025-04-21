@@ -458,6 +458,8 @@ def read_income(month, year, id, user_group=0):
         income_list_element.append(full_name)
         income_list.append(income_list_element)
 
+    print(f"final testing income list: {income_list}")
+
     return income_list
 
 def delete_income(income_id, user_group=0):
