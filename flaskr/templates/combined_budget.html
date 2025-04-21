@@ -216,17 +216,20 @@
 
                                 <label for="memo">Memo:</label>
                                 <input type="text" id="transMemo" name="memo">
+                            </div>
 
-                                <!-- category input setup -->
+                            <!-- category input setup -->
+                            <div id="categoryContainer">
+                                    
                                 <div id="categoryDropdown">
-                                    <label for="category-list">Category:</label>
-                                    <select id="category-list" name="category-list">
-                                        {% for category in category_list %}
-                                            <option> {{ category }}</option>
-                                        {% endfor %}
-                                    </select>
+                                <label for="category-list">Category:</label>
+                                <select id="category-list" name="category-list">
+                                    {% for category in category_list %}
+                                        <option> {{ category }}</option>
+                                    {% endfor %}
+                                </select>
                                 </div>
-                                
+                            
                                 <div id="categoryInput" style="display: none;">
                                     <label for="add-category">New Category:</label>
                                     <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
@@ -235,13 +238,16 @@
                                 <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                                 <button type="button" id="toggleCategoryBtn">Add Category</button>
+                                </div>
+
+                                <button type="submit" id="submitTransBtn">Submit</button>
                             </div>
                             
-                            <button type="submit" id="submitTransBtn">Submit</button>
 
                             <!-- add styling-->
                             <div id="transactionFeedbackMessage">
                             </div>
+                            
                         </form>
                     </section>
                         

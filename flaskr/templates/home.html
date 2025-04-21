@@ -145,7 +145,7 @@
             <section class="transaction-form" id="transactionForm">
                 <h3>Enter Transaction</h3>
                 <form id="transForm">
-                    <div>
+                    <div id="inputContainer">
                         <label for="date">Date:</label>
                         <input type="text" id="transDate" name="date" required>
 
@@ -154,7 +154,9 @@
 
                         <label for="memo">Memo:</label>
                         <input type="text" id="transMemo" name="memo">
+                    </div>
 
+                    <div id="categoryContainer">
                         <!-- category input setup -->
                         <div id="categoryDropdown">
                             <label for="category-list">Category:</label>
@@ -173,9 +175,11 @@
                         <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                         <button type="button" id="toggleCategoryBtn">Add Category</button>
-                    </div>
+                    
                     
                     <button type="submit" id="submitTransBtn">Submit</button>
+
+                    </div>
 
                     <!-- add styling-->
                     <div id="transactionFeedbackMessage">
