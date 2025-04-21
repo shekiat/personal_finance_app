@@ -182,7 +182,7 @@ function addMessageToChat(user, message, timestamp) {
         chatMessages.appendChild(transDiv);
     }
     else {
-        messageDiv.innerHTML = `${user}: ${message} (${timestamp})`;
+        messageDiv.innerHTML = `${user}: ${message}`;
         messageDiv.style.marginBottom = '5px';
         chatMessages.appendChild(messageDiv);
     }
