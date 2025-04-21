@@ -549,7 +549,7 @@ def read_month_totals(month, year, id, user_group=0):
     else: 
         expense_total = 0
 
-    if id == 0:
+    if user_group == 0:
         db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM INCOME WHERE MONTH = %s AND YEAR = %s AND USER_ID = %s", (month, year, id))
     else:
         db_cursor.execute("SELECT SUM(INCOME_AMOUNT) FROM GROUP_INCOME WHERE MONTH = %s AND YEAR = %s AND GROUP_ID = %s", (month, year, id))
