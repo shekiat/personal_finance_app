@@ -32,6 +32,7 @@ attachIncomeChatListeners();
 
 // attach chat listeners on transaction entries
 function attachTransChatListeners() {
+    console.log("attaching transction chat listeners");
     document.querySelectorAll('.trans-chat-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             console.log("transaction chat button hit");
@@ -77,14 +78,14 @@ function attachTransChatListeners() {
 
 // attach chat listeners on income entries
 function attachIncomeChatListeners() {
+    console.log("attaching income chat listeners")
     document.querySelectorAll('.income-chat-btn').forEach(button => {
         button.addEventListener('click', (event) => {
-            console.log("income chat button hit");
             const incomeAmount = event.target.getAttribute('income-amount');
             const incomeDate = event.target.getAttribute('income-date');
             const incomeMemo = event.target.getAttribute('income-memo');
             const incomeName = event.target.getAttribute('income-name');
-            message = '$' + incomeAmount + '<br>' + incomeDate;
+            message = incomeAmount + '<br>' + incomeDate;
 
             if (incomeName != user_name) { 
                 message = incomeName + '<br>' + message;
@@ -212,14 +213,6 @@ async function fetchMessages() {
                 addMessageToChat(msg.user, msg.message);
             });
 
-            for (let i = 4; i >= 0; i--) {
-                console.log(lastFiveMessagesOnPage[i]);
-                console.log(lastFiveMessagesFromDB[i]);
-                if (lastFiveMessagesOnPage[i] != lastFiveMessagesFromDB[i]) {
-                    addMessageToChat(lastFiveMessagesOnPage[i].user, lastFiveMessagesOnPage[i].message);
-                }
-            }
-
             chatMessages.scrollTop = chatMessages.scrollHeight - scrollOffsetFromBottom; // restore scrolled to position
         }
     } catch (error) {
@@ -232,6 +225,9 @@ window.onload = fetchMessages;
 
 // Poll for new messages every 5 seconds
 setInterval(fetchMessages, 5000);
+setInterval(updateStats, 5000);
+setInterval(fetchUpdatedIncome, 5000);
+setInterval(fetchUpdatedTransactions, 5000);
 
 
 // copied over from home.js
@@ -289,6 +285,7 @@ document.addEventListener("click", function (e) {
     }
 
     document.getElementById("transactionFeedbackMessage").innerText = "";
+    document.getElementById("incomeFeedbackMessage").innerText = "";
     
     console.log(categorySelect.value)
     console.log(categoryInput.value)
@@ -463,9 +460,9 @@ submitTransBtn.addEventListener("click", function() {
 // update transaction table
 function updateTransactionTable(transactions) {
     console.log("updating transactions");
-    const tableBody = document.querySelector("#transactionTable table");
+    const tableBody = document.querySelector("#transactionTable table tbody");
 
-    tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
+    tableBody.querySelectorAll("tr").forEach(row => row.remove());
 
     transactions.forEach(transaction => {
         const formattedDate = formatDate(transaction[3]);
@@ -486,6 +483,17 @@ function updateTransactionTable(transactions) {
                         Delete
                     </button>
                 </td>
+                 <td>
+                    <button 
+                        class="trans-chat-btn" 
+                        transaction-name="${ transaction[9] }"
+                        transaction-amount="${ formattedAmount }"
+                        transaction-date="${ formattedDate }"
+                        transaction-category="${ capitalizedCategory }"
+                        transaction-memo = "${ transaction[4] }">
+                        >
+                    </button>
+                </td>
             </tr>
         `;
         tableBody.innerHTML += row;
@@ -501,9 +509,8 @@ function formatDate(date) {
 }
 function formatAmount(amount) {
     const strAmount = amount.toString();
-    return strAmount.includes(".") && strAmount.split(".")[1].length === 1
-        ? `$${strAmount}0`
-        : `$${strAmount}`;
+    const formattedAmount = parseFloat(strAmount).toFixed(2);
+    return `$${formattedAmount}`
 }
 
 function fetchUpdatedTransactions() {
@@ -517,6 +524,7 @@ function fetchUpdatedTransactions() {
 
 // attach delete listeners on table entries
 function attachTransDeleteListeners() {
+    console.log("attaching delete trans buttons");
     document.querySelectorAll('.delete-trans-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             console.log("delete button hit");
@@ -533,8 +541,8 @@ function attachTransDeleteListeners() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    event.target.closest('tr').remove();
                     updateStats();
+                    fetchUpdatedTransactions();
                 }
             });
         });
@@ -597,9 +605,9 @@ submitIncomeBtn.addEventListener("click", function() {
 // update transaction table
 function updateIncomeTable(income) {
     console.log("updating income");
-    const tableBody = document.querySelector("#incomeTable table");
+    tableBody = document.querySelector("#incomeTable table tbody");
 
-    tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
+    tableBody.querySelectorAll("tr").forEach(row => row.remove());
 
     income.forEach(income => {
         const formattedDate = formatDate(income[2]);
@@ -618,13 +626,22 @@ function updateIncomeTable(income) {
                         Delete
                     </button>
                 </td>
+                <td>
+                    <button 
+                        class="income-chat-btn" 
+                        income-name="${ income[8] }"
+                        income-amount="${ formattedAmount }"
+                        income-date="${ formattedDate }"
+                        income-memo = "${ income[3] }">
+                        >
+                    </button>
+                </td>
             </tr>
         `;
         tableBody.innerHTML += row;
     });
-
-    attachIncomeDeleteListeners();
     attachIncomeChatListeners();
+    attachIncomeDeleteListeners();
 }
 
 function fetchUpdatedIncome() {
@@ -638,6 +655,7 @@ function fetchUpdatedIncome() {
 
 // attach delete listeners on table entries
 function attachIncomeDeleteListeners() {
+    console.log("attaching delete chat buttons")
     document.querySelectorAll('.delete-income-btn').forEach(button => {
         button.addEventListener('click', (event) => {
             console.log("delete button hit");
@@ -654,7 +672,7 @@ function attachIncomeDeleteListeners() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    event.target.closest('tr').remove();
+                    fetchUpdatedIncome();
                     updateStats();
                 }
             });
@@ -688,6 +706,8 @@ submitDateBtn.addEventListener("click", function() {
         }
     })
     .then(data => {
+        monthYearHeader = document.getElementById("monthYearHeader");
+        monthYearHeader.innerHTML = `${data.chosen_month} ${data.chosen_year}`
         updateStats()
         fetchUpdatedTransactions()
     })
@@ -722,14 +742,9 @@ function updateStats() {
 
 function updateStatBox(selector, value, diff, diffPerc) {
     const box = document.querySelector(selector);
+    const formattedAmount = `$${parseFloat(value).toFixed(2)}`;
 
-    const formattedValue = (Number.isInteger(value))
-        ? `$${value}.00`
-        : (value.toString().includes('.') && value.toString().split('.')[1].length === 1)
-            ? `$${value}0`
-            : `$${value}`;
-
-    box.querySelector("p:nth-of-type(1)").innerHTML = formattedValue;
+    box.querySelector("p:nth-of-type(1)").innerHTML = formattedAmount;
 
     if (diff !== 0) {
         const formattedDiff = (diff.toString().includes('.') && diff.toString().split('.')[1].length === 1)

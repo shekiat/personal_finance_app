@@ -292,7 +292,7 @@ def home():
 
     # fetch current and past month totals
     total_values = read_month_totals(session['current_month'], session['current_year'], session["user_id"])
-    past_month_total_values = read_month_totals(session['current_month'] - 1, session['current_year'] - 1, session["user_id"])
+    past_month_total_values = read_month_totals(session['current_month'] - 1, session['current_year'], session["user_id"])
     # calculate differences, percent differences
     total_diffs = [0, 0, 0]
     total_diff_percs = [0, 0, 0]
@@ -300,7 +300,7 @@ def home():
         total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
         for i in range(3):
             if past_month_total_values[i] != 0:
-                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+                total_diff_percs[i] = round((total_values[i] - past_month_total_values[i]) / abs(past_month_total_values[i]) * 100, 2)
 
     print(f"user id on home page: {session['user_id']}")
     trans_list = read_transactions(session['current_month'], session['current_year'], session["user_id"])
@@ -464,13 +464,13 @@ def month_change():
     session['current_month'] = int(month_number)
     session['current_year'] = int(year)
 
-    return jsonify({"chosen_month" : month_number, "chosen_year" : year})
+    return jsonify({"chosen_month": month, "chosen_year" : year})
 
 @bp.route("/api/update-stats", methods=["POST"])
 def update_stats_and_totals():
     # fetch current and past month totals
     total_values = read_month_totals(session['current_month'], session['current_year'], session["user_id"])
-    past_month_total_values = read_month_totals(session['current_month'] - 1, session['current_year'] - 1, session["user_id"])
+    past_month_total_values = read_month_totals(session['current_month'] - 1, session['current_year'], session["user_id"])
     # calculate differences, percent differences
     total_diffs = [0, 0, 0]
     total_diff_percs = [0, 0, 0]
@@ -478,7 +478,7 @@ def update_stats_and_totals():
         total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
         for i in range(3):
             if past_month_total_values[i] != 0:
-                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+                total_diff_percs[i] = round((total_values[i] - past_month_total_values[i]) / abs(past_month_total_values[i]) * 100, 2)
 
     for i in range(3):
         if total_diffs[i] < 0:

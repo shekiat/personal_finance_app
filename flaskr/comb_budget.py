@@ -187,8 +187,11 @@ def comb_budget():
         session['current_group_year'] = datetime.datetime.now().year
 
         # fetch current and past month totals
+        print(session['current_group_month'] - 1)
         total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
-        past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["group_id"], 1)
+        past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'], session["group_id"], 1)
+        print(f"total_values in cb.py: {total_values}")
+        print(f"past_month_total_values in cb.py: {past_month_total_values}")
         # calculate differences, percent differences
         total_diffs = [0, 0, 0]
         total_diff_percs = [0, 0, 0]
@@ -196,7 +199,7 @@ def comb_budget():
             total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
             for i in range(3):
                 if past_month_total_values[i] != 0:
-                    total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+                    total_diff_percs[i] = round((total_values[i] - past_month_total_values[i]) / abs(past_month_total_values[i]) * 100, 2)
 
         trans_list = read_transactions(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
         income_list = read_income(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
@@ -325,13 +328,13 @@ def group_month_change():
     session['current_group_month'] = int(month_number)
     session['current_group_year'] = int(year)
 
-    return jsonify({"chosen_month" : month_number, "chosen_year" : year})
+    return jsonify({"chosen_month" : month, "chosen_year" : session['current_group_year']})
 
 @bp.route("/api/group-update-stats", methods=["POST"])
 def group_update_stats_and_totals():
     # fetch current and past month totals
     total_values = read_month_totals(session['current_group_month'], session['current_group_year'], session["group_id"], 1)
-    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'] - 1, session["group_id"], 1)
+    past_month_total_values = read_month_totals(session['current_group_month'] - 1, session['current_group_year'], session["group_id"], 1)
     # calculate differences, percent differences
     total_diffs = [0, 0, 0]
     total_diff_percs = [0, 0, 0]
@@ -339,7 +342,7 @@ def group_update_stats_and_totals():
         total_diffs = [round(x - y, 2) for x, y in zip(total_values, past_month_total_values)]
         for i in range(3):
             if past_month_total_values[i] != 0:
-                total_diff_percs[i] = round(total_values[i] / past_month_total_values[i] * 100 - 100, 2)
+                total_diff_percs[i] = round((total_values[i] - past_month_total_values[i]) / abs(past_month_total_values[i]) * 100, 2)
 
     for i in range(3):
         if total_diffs[i] < 0:
@@ -357,6 +360,7 @@ def group_update_stats_and_totals():
 def group_update_transaction_table():
     print(f"updating transactions")
     trans_list = read_transactions(session["current_group_month"], session["current_group_year"], session["group_id"], 1)
+    print(trans_list)
     return jsonify({"trans_list": trans_list})
 
 @bp.route("/api/group-update-income-table")

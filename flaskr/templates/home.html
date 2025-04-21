@@ -118,13 +118,12 @@
 
                 <div class="stat-box">
                     <h4>Total Income</h4>
-                    <div class="incomeContainer">
-                        {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
-                            <p>${{total_values[2]}}0</p>
-                        {% else %}
-                            <p>${{total_values[2]}}</p>
-                        {% endif %}
-                    </div>
+                    {% if (total_values[2] | string)[total_values[2] | string | length - 2 ] == "." %}
+                        <p>${{total_values[2]}}0</p>
+                    {% else %}
+                        <p>${{total_values[2]}}</p>
+                    {% endif %}
+                    
                     {% if total_diffs[2] != 0 %}
                         {% if (total_diffs[2] | string)[total_diffs[2] | string | length - 2 ] == "." %}
                             <p>{{total_diffs[2]}}0 ({{total_diff_percs[2]}}%)</p>
@@ -216,45 +215,49 @@
             <section class="transactions" id="transactionTable">
                 <h3>Transactions</h3>
                 <table>
-                    <tr>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Category</th>
-                        <th>Memo</th>
-                        <th></th>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                            <th>Memo</th>
+                            <th></th>
 
-                    </tr>
-                    <!--For loop for pulling transactions from db-->
-                    {% for transaction in trans_list %}
-                    <tr>
-                        <td>{{ transaction[8] }}</td>
-                        <!--format date-->
-                        {% if transaction[3][5] == "1" %}
-                            <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
-                        {% else %}
-                            <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
-                        {% endif %}
-                        <!--add zero to end of amount if it should end in one-->
-                        {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
-                            <td>${{transaction[1]}}0</td>
-                        {% else %}
-                            <td>${{transaction[1]}}</td>
-                        {% endif %}
-                        <td>{{transaction[2].title()}}</td>
-                        <td>{{transaction[4]}}</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--For loop for pulling transactions from db-->
+                        {% for transaction in trans_list %}
+                        <tr>
+                            <td>{{ transaction[8] }}</td>
+                            <!--format date-->
+                            {% if transaction[3][5] == "1" %}
+                                <td> {{transaction[3][5:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                            {% else %}
+                                <td> {{transaction[3][6:7] + "/" + transaction[3][8:11] + "/" + transaction[3][0:4]}}</td>
+                            {% endif %}
+                            <!--add zero to end of amount if it should end in one-->
+                            {% if (transaction[1] | string)[transaction[1] | string | length - 2 ] == "." %}
+                                <td>${{transaction[1]}}0</td>
+                            {% else %}
+                                <td>${{transaction[1]}}</td>
+                            {% endif %}
+                            <td>{{transaction[2].title()}}</td>
+                            <td>{{transaction[4]}}</td>
 
-                        <!--delete transaction-->
-                        <td>
-                            <button 
-                                class="delete-trans-btn" 
-                                transaction-id="{{ transaction[0] }}">
-                                Delete
-                            </button>
-                        </td>
-                        
+                            <!--delete transaction-->
+                            <td>
+                                <button 
+                                    class="delete-trans-btn" 
+                                    transaction-id="{{ transaction[0] }}">
+                                    Delete
+                                </button>
+                            </td>
+                            
 
-                    </tr>
+                        </tr>
+                    </tbody>
                     {% endfor %}
                 </table>
             </section>
@@ -264,42 +267,46 @@
             <section class="income" id="incomeTable" style="display: none;">
                 <h3>Income</h3>
                 <table>
-                    <tr>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Memo</th>
-                        <th></th>
-                    </tr>
-                    <!--For loop for pulling income from db-->
-                    {% for income in income_list %}
-                    <tr>
-                        <td>{{ income[7] }}</td>
-                        <!--format date-->
-                        {% if income[2][5] == "1" %}
-                            <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
-                        {% else %}
-                            <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
-                        {% endif %}
-                        <!--add zero to end of amount if it should end in one-->
-                        {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
-                            <td>${{income[1]}}0</td>
-                        {% else %}
-                            <td>${{income[1]}}</td>
-                        {% endif %}
-                        <td>{{income[3]}}</td>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Memo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--For loop for pulling income from db-->
+                        {% for income in income_list %}
+                        <tr>
+                            <td>{{ income[7] }}</td>
+                            <!--format date-->
+                            {% if income[2][5] == "1" %}
+                                <td> {{income[2][5:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                            {% else %}
+                                <td> {{income[2][6:7] + "/" + income[2][8:11] + "/" + income[2][0:4]}}</td>
+                            {% endif %}
+                            <!--add zero to end of amount if it should end in one-->
+                            {% if (income[1] | string)[income[1] | string | length - 2 ] == "." %}
+                                <td>${{income[1]}}0</td>
+                            {% else %}
+                                <td>${{income[1]}}</td>
+                            {% endif %}
+                            <td>{{income[3]}}</td>
 
-                        <!--delete income-->
-                        <td>
-                            <button 
-                                class="delete-income-btn" 
-                                income-id="{{ income[0] }}">
-                                Delete
-                            </button>
-                        </td>
+                            <!--delete income-->
+                            <td>
+                                <button 
+                                    class="delete-income-btn" 
+                                    income-id="{{ income[0] }}">
+                                    Delete
+                                </button>
+                            </td>
 
-                    </tr>
-                    {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
             </section>
 
