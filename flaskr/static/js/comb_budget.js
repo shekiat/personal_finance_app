@@ -110,7 +110,7 @@ function attachIncomeChatListeners() {
                     console.error('Failed to send message:', result.error);
                 }
                 else { 
-                    addMessageToChat(user_name, message);
+                    fetchMessages();
                 }
             } catch (error) {
                 console.error('Error sending message:', error);
@@ -148,8 +148,7 @@ document.getElementById('chatForm').addEventListener('submit', async (event) => 
                 console.error('Failed to send message:', result.error);
             }
             else {
-                // display message in chat box
-                addMessageToChat(user_name, message);
+                fetchMessages();
             }
         } catch (error) {
             console.error('Error sending message:', error);
