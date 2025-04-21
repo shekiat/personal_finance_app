@@ -191,6 +191,22 @@ header {
     
 }
 
+.transaction-form #inputContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    flex-wrap: nowrap; 
+}
+
+.transaction-form #categoryContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    flex-wrap: nowrap; 
+}
+
 .transaction-form #category{
     width: 100px;
     height: 20px;
@@ -339,7 +355,7 @@ header {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 80px;
+    padding: 50px;
     text-align: center;
 }
 
@@ -374,51 +390,50 @@ header {
     grid-template-columns: none;
 }
 
-.group-transactions {
-    margin-top: 50px;
-}
 
-.group-transactions table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-}
-
-.group-transaction-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.transaction-form form {
+#combined-budget-container .transaction-form form {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
     gap: 5px; 
     flex-wrap: nowrap; 
     
 }
 
 
-.transaction-form label {
+#combined-budget-container .transaction-form label {
     margin-right: 0;
 }
 
 
-.transaction-form button {
+#combined-budget-container .transaction-form button {
    
     margin: 0 10px;
     
+} 
+
+#combined-budget-container .transForm [type="text"] {
+    flex-direction: row;
+    width: 100px;
+    
 }
 
-.transaction-form #category{
+#combined-budget-container .transaction-form #categoryContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    flex-wrap: nowrap; 
+}
+
+#combined-budget-container .transaction-form #category{
     width: 100px;
     height: 20px;
-    margin-left: 10px;
+    margin-left: 6px;
 }
 
 
-.transaction-form #subCategoryBtn {
+#combined-budget-container .transaction-form #subCategoryBtn {
     width: 200px;
     display:none;
 
