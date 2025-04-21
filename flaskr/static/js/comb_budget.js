@@ -41,7 +41,7 @@ function attachTransChatListeners() {
             const transactionCategory = event.target.getAttribute('transaction-category');
             const transactionMemo = event.target.getAttribute('transaction-memo');
             const transactionName = event.target.getAttribute('transaction-name');
-            message = '$' + transactionAmount + '<br>' + transactionDate + '<br>' + transactionCategory;
+            message = transactionAmount + '<br>' + transactionDate + '<br>' + transactionCategory;
             
             if (transactionName != user_name) { 
                 message = transactionName + '<br>' + message;
