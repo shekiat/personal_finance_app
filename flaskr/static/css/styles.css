@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
 
 
+
 body {
     background-color: #121212;
     color: white;
@@ -29,7 +30,7 @@ body {
 
 .page-header button{
     background-color: transparent;
-    width: 40px;
+    width: 80px;
     color: white;
     border: none;
 }
@@ -120,8 +121,15 @@ header {
    
 }
 
-.addIncomeExpense{
+.button-wrapper{
+    display: flex;
     justify-content: center;
+    width: 100%;
+    margin-top: 10px
+}
+
+.addIncomeExpense {
+    text-align: center;
 }
 
 .home button:hover {
@@ -189,6 +197,22 @@ header {
    
     margin: 0 10px;
     
+}
+
+.transaction-form #inputContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    flex-wrap: nowrap; 
+}
+
+.transaction-form #categoryContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    flex-wrap: nowrap; 
 }
 
 .transaction-form #category{

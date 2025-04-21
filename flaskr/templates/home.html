@@ -113,7 +113,7 @@
                     {% else %}
                         <p>-</p>
                     {% endif %}
-                    <button class="addIncomeExpense" type="button" id="addExpenseButton" style="display: none; justify-content: center;">Add/View Expenses</button>
+                    <div class="button-wrapper"><button class="addIncomeExpense" type="button" id="addExpenseButton" style="display: none; justify-content: center;">Add/View Expenses</button></div>
                 </div>
 
                 <div class="stat-box">
@@ -133,7 +133,7 @@
                     {% else %}
                         <p>-</p>
                     {% endif %}
-                    <div><button class="addIncomeExpense" type="button" id="addIncomeButton" style="justify-content: center;">Add/View Income</button></div>
+                    <div class="button-wrapper"><button class="addIncomeExpense" type="button" id="addIncomeButton" style="justify-content: center;">Add/View Income</button></div>
                 </div>
                 
             </section>
@@ -144,7 +144,7 @@
             <section class="transaction-form" id="transactionForm">
                 <h3>Enter Transaction</h3>
                 <form id="transForm">
-                    <div>
+                    <div id="inputContainer">
                         <label for="date">Date:</label>
                         <input type="text" id="transDate" name="date" required>
 
@@ -153,7 +153,9 @@
 
                         <label for="memo">Memo:</label>
                         <input type="text" id="transMemo" name="memo">
+                    </div>
 
+                    <div id="categoryContainer">
                         <!-- category input setup -->
                         <div id="categoryDropdown">
                             <label for="category-list">Category:</label>
@@ -172,9 +174,11 @@
                         <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                         <button type="button" id="toggleCategoryBtn">Add Category</button>
-                    </div>
+                    
                     
                     <button type="submit" id="submitTransBtn">Submit</button>
+
+                    </div>
 
                     <!-- add styling-->
                     <div id="transactionFeedbackMessage">
@@ -197,10 +201,9 @@
                             <label for="memo">Memo:</label>
                             <input type="text" id="incomeMemo" name="memo">
 
-                            <!-- stay on same month and year -->
+                            <button type="submit" id="submitIncomeBtn">Submit</button>
                         </div>
                         
-                        <button type="submit" id="submitIncomeBtn">Submit</button>
 
                         <!-- add styling-->
                         <div id="incomeFeedbackMessage">

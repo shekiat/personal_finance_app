@@ -109,8 +109,6 @@ const failAmountMessage = document.getElementById("failAmountMessage");
 
 
 addIncome.addEventListener("click", function() {
-    expense_income = 1;
-
     transactionForm.style.display = "none";
     incomeForm.style.display = "block";
 
@@ -127,8 +125,6 @@ addIncome.addEventListener("click", function() {
 });
 
 addExpense.addEventListener("click", function() {
-    expense_income = 0;
-
     transactionForm.style.display = "block";
     incomeForm.style.display = "none";
 
