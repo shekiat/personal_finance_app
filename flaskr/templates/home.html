@@ -177,7 +177,7 @@
                         <button type="button" id="toggleCategoryBtn">Add Category</button>
                     
                     
-                    <button type="submit" id="submitTransBtn">Submit</button>
+                        <button type="submit" id="submitTransBtn">Submit</button>
 
                     </div>
 
@@ -192,7 +192,7 @@
             <section class="income-form" id="incomeForm" style="display: none;">
                 <h3>Enter Income</h3>
                     <form id="incomeForm">
-                        <div>
+                        <div id="inputContainer">
                             <label for="date">Date:</label>
                             <input type="text" id="incomeDate" name="date" required>
 
@@ -202,15 +202,17 @@
                             <label for="memo">Memo:</label>
                             <input type="text" id="incomeMemo" name="memo">
 
+
+                        </div>
+                        <div id="submitBtnContainer">
+                            <button type="submit" id="submitIncomeBtn">Submit</button>
                             <!-- stay on same month and year -->
                         </div>
                         
-                        <button type="submit" id="submitIncomeBtn">Submit</button>
-
                         <!-- add styling-->
                         <div id="incomeFeedbackMessage">
                         </div>
-                        </form>
+                    </form>
             </section>
 
             

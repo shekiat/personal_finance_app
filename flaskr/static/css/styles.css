@@ -39,6 +39,11 @@ body {
     cursor: pointer;
 }
 
+.page-header .combinedBudgetButton{
+    width: 100px;
+}
+
+
 /* ----- Home Page Styling ------ */
 .home {
     text-align: center;
@@ -102,6 +107,7 @@ body {
     margin-top: 60px;
 }
 
+
 header {
     display: flex;
     justify-content: space-between;
@@ -152,6 +158,17 @@ header {
     padding: 20px;
     width: 30%;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.home .stat-box button#addIncomeButton {
+    margin-left: 30%;
+}
+
+.home .stat-box button#addExpenseButton {
+    width: 50%;
+    margin-left: 25%;
 }
 
 .transactions {
@@ -168,6 +185,7 @@ header {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: 50px;
 }
 
 .transaction-form form {
@@ -195,16 +213,20 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    width: 80%;
+    width: 100%;
     flex-wrap: nowrap; 
+}
+
+.transaction-form #transDate {
+    width: 100px;
 }
 
 .transaction-form #categoryContainer{
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
     width: 80%;
-    flex-wrap: nowrap; 
+    flex-wrap: nowrap;
+    margin-left: 50px;
 }
 
 .transaction-form #category{
@@ -213,12 +235,25 @@ header {
     margin-left: 10px;
 }
 
+.transaction-form #categoryDropdown {
+    width: 220px;
+}
+
+
+.transaction-form select#category-list {
+    width: 100px;
+}
 
 .transaction-form #subCategoryBtn {
     width: 200px;
     display:none;
 
 }
+
+.transaction-form #toggleCategoryBtn {
+    width: 30%;
+}
+
 .transaction-form #successMessage {
     display:none;
     color: green;
@@ -240,9 +275,38 @@ header {
     color: yellow;
 }
 
-.income table {
+.content .incomeForm {
+    margin-top: 70px;
+}
+
+.content #incomeForm {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
     width: 100%;
-    margin-top: 20px;
+    flex-wrap: nowrap;
+}
+
+
+.income-form {
+    margin-top: 50px;
+}
+
+.income-form #inputContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 50%;
+    flex-wrap: nowrap; 
+}
+
+.income-form label {
+    margin: 0 20px;
+}
+
+.income {
+    width: 100%;
+    margin-top: 50px;
     border-collapse: collapse;
 }
 
@@ -349,7 +413,9 @@ header {
 .budget-form {
     text-align: center;
     justify-content: center;
+    margin: 60px 0 50px 0;
 }
+
 .combined-budget-body {
     display: flex;
     flex-direction: column;
@@ -390,6 +456,23 @@ header {
     grid-template-columns: none;
 }
 
+#combined-budget-container .stat-box {
+    background: #1E1E1E;
+    padding: 20px;
+    width: 30%;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+#combined-budget-container .stat-box button#addIncomeButton {
+    margin-left: 20%;
+}
+
+#combined-budget-container .stat-box button#addExpenseButton {
+    width: 80%;
+    margin-left: 10%;
+}
 
 #combined-budget-container .transaction-form form {
     display: flex;
@@ -397,12 +480,7 @@ header {
     justify-content: space-between;
     gap: 5px; 
     flex-wrap: nowrap; 
-    
-}
-
-
-#combined-budget-container .transaction-form label {
-    margin-right: 0;
+    margin-top: 50px;
 }
 
 
@@ -412,18 +490,33 @@ header {
     
 } 
 
-#combined-budget-container .transForm [type="text"] {
-    flex-direction: row;
+#combined-budget-container .transaction-form #inputContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    flex-wrap: nowrap; 
+}
+
+#combined-budget-container .transaction-form label {
+    margin: 0 20px;
+}
+
+#combined-budget-container .transaction-form #transDate {
+    width: 70px;
+}
+
+#combined-budget-container input#transAmount, input#transMemo {
     width: 100px;
-    
+    margin: 0 15px;
 }
 
 #combined-budget-container .transaction-form #categoryContainer{
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
     width: 80%;
-    flex-wrap: nowrap; 
+    flex-wrap: nowrap;
+    margin-left: 50px; 
 }
 
 #combined-budget-container .transaction-form #category{
@@ -432,40 +525,93 @@ header {
     margin-left: 6px;
 }
 
+#combined-budget-container .transaction-form #categoryDropdown {
+    width: 230px;
+}
+
+
+#combined-budget-container .transaction-form select#category-list {
+    width: 100px;
+}
 
 #combined-budget-container .transaction-form #subCategoryBtn {
     width: 200px;
     display:none;
 
 }
-.transaction-form #successMessage {
+
+#combined-budget-container .transaction-form #toggleCategoryBtn {
+    width: 30%;
+}
+
+#combined-budget-container .transaction-form #successMessage {
     display:none;
     color: green;
 }
-.transactions th, .transactions td {
+
+#combined-budget-container .transactions th, .transactions td {
     padding: 10px;
     border-bottom: 1px solid #333;
 }
 
-.transactions td.complete {
+#combined-budget-container .transactions td.complete {
     color: green;
 }
 
-.transactions td.failed {
+#combined-budget-container .transactions td.failed {
     color: red;
 }
 
-.transactions td.pending {
+#combined-budget-container .transactions td.pending {
     color: yellow;
 }
 
-.income table {
+#combined-budget-container .content .incomeForm {
+    margin-top: 70px;
+}
+
+#combined-budget-container .content #incomeForm {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
     width: 100%;
-    margin-top: 20px;
+    flex-wrap: nowrap;
+}
+
+
+#combined-budget-container .income-form {
+    margin-top: 50px;
+}
+
+#combined-budget-container .income-form #inputContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: nowrap; 
+}
+
+#combined-budget-container .income-form label {
+    margin: 0 20px;
+}
+
+#combined-budget-container button#submitIncomeBtn {
+    margin-left: 100px;
+}
+
+#combined-budget-container .income {
+    width: 100%;
+    margin-top: 50px;
     border-collapse: collapse;
 }
 
-.income th, .transactions td {
+#combined-budget-container .income {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+}
+
+#combined-budget-container .income th, .transactions td {
     padding: 10px;
     border-bottom: 1px solid #333;
 }

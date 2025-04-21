@@ -207,7 +207,7 @@
                     <section class="transaction-form" id="transactionForm">
                         <h3>Enter Transaction</h3>
                         <form id="transForm">
-                            <div>
+                            <div id="inputContainer">
                                 <label for="date">Date:</label>
                                 <input type="text" id="transDate" name="date" required>
 
@@ -222,12 +222,12 @@
                             <div id="categoryContainer">
                                     
                                 <div id="categoryDropdown">
-                                <label for="category-list">Category:</label>
-                                <select id="category-list" name="category-list">
-                                    {% for category in category_list %}
-                                        <option> {{ category }}</option>
-                                    {% endfor %}
-                                </select>
+                                    <label for="category-list">Category:</label>
+                                    <select id="category-list" name="category-list">
+                                        {% for category in category_list %}
+                                            <option> {{ category }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             
                                 <div id="categoryInput" style="display: none;">
@@ -238,7 +238,7 @@
                                 <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                                 <button type="button" id="toggleCategoryBtn">Add Category</button>
-                                </div>
+                                
 
                                 <button type="submit" id="submitTransBtn">Submit</button>
                             </div>
@@ -256,7 +256,7 @@
                     <section class="income-form" id="incomeForm" style="display: none;">
                         <h3>Enter Income</h3>
                             <form id="incomeForm">
-                                <div>
+                                <div id="inputContainer">
                                     <label for="date">Date:</label>
                                     <input type="text" id="incomeDate" name="date" required>
 
@@ -267,12 +267,14 @@
                                     <input type="text" id="incomeMemo" name="memo">
                                 </div>
                                 
+                                <div id="submitBtnContainer"></div>
                                 <button type="submit" id="submitIncomeBtn">Submit</button>
+                                </div>
 
                                 <!-- add styling-->
                                 <div id="incomeFeedbackMessage">
                                 </div>
-                                </form>
+                            </form>
                     </section>
 
                     
