@@ -708,8 +708,10 @@ submitDateBtn.addEventListener("click", function() {
     .then(data => {
         monthYearHeader = document.getElementById("monthYearHeader");
         monthYearHeader.innerHTML = `${data.chosen_month} ${data.chosen_year}`
-        updateStats()
+        addIncomeExpense = document.getElementById("addIncomeExpense");
+        fetchUpdatedIncome()
         fetchUpdatedTransactions()
+        updateStats()
     })
 });
 

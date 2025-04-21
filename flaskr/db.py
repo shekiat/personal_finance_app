@@ -426,8 +426,6 @@ def write_income(user, amount, date, memo, user_id, group_id=-1):
     else:
         data = (new_id, amount, date, memo if memo else '', user_id, group_id)
         db_cursor.execute(f"INSERT INTO GROUP_INCOME (INCOME_ID, INCOME_AMOUNT, INCOME_DATE, INCOME_MEMO, USER_ID, GROUP_ID) VALUES(%s, %s, %s, %s, %s, %s)", data)
-    data = (new_id, amount, date, memo if memo else '', user_id)
-    db_cursor.execute(f"INSERT INTO INCOME (INCOME_ID, INCOME_AMOUNT, INCOME_DATE, INCOME_MEMO, USER_ID) VALUES(%s, %s, %s, %s, %s)", data)
     db.commit()
     db_cursor.close()
 
