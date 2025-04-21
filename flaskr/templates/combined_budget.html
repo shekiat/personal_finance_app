@@ -6,7 +6,7 @@
 
             <form id="inviteForm">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Enter email" required>
+                <input autocomplete="off" type="email" id="email" name="email" placeholder="Enter email" required>
                 <button type="submit">Send Invitation</button>
             </form>
         </section> -->
@@ -60,7 +60,7 @@
 
                     <form id="inviteForm">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" placeholder="Enter email" required>
+                        <input autocomplete="off" type="email" id="email" name="email" placeholder="Enter email" required>
                         <button type="submit">Send Invitation</button>
                     </form>
                 </section>
@@ -74,7 +74,7 @@
 
                         <form id="inviteForm">
                             <label for="email">Email:</label>
-                            <input type="email" id="email" name="email" placeholder="Enter email" required>
+                            <input autocomplete="off" type="email" id="email" name="email" placeholder="Enter email" required>
                             <button type="submit">Send Invitation</button>
                         </form>
                     </section>
@@ -204,19 +204,21 @@
                     </section>
 
                     <!-- Transaction Form -->
-                    <section class="transaction-form" id="transactionForm">
+                    <section class="transaction-form-group" id="transactionForm">
                         <h3>Enter Transaction</h3>
                         <form id="transForm">
                             <div>
                                 <label for="date">Date:</label>
-                                <input type="text" id="transDate" name="date" required>
+                                <input autocomplete="off" type="text" id="transDate" name="date" required>
 
                                 <label for="amount">Amount:</label>
-                                <input type="text" id="transAmount" name="amount" required>
+                                <input autocomplete="off" type="text" id="transAmount" name="amount" required>
 
                                 <label for="memo">Memo:</label>
-                                <input type="text" id="transMemo" name="memo">
+                                <input autocomplete="off" type="text" id="transMemo" name="memo">
+                            </div>
 
+                            <div id="categoryContainer">
                                 <!-- category input setup -->
                                 <div id="categoryDropdown">
                                     <label for="category-list">Category:</label>
@@ -229,16 +231,16 @@
                                 
                                 <div id="categoryInput" style="display: none;">
                                     <label for="add-category">New Category:</label>
-                                    <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
+                                    <input autocomplete="off" type="text" id="add-category" name="add-category" placeholder="Type in your category">
                                 </div>
 
-                                <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
+                                <input autocomplete="off" type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                                 <button type="button" id="toggleCategoryBtn">Add Category</button>
-                            </div>
                             
                             <button type="submit" id="submitTransBtn">Submit</button>
 
+                            </div>
                             <!-- add styling-->
                             <div id="transactionFeedbackMessage">
                             </div>
@@ -252,17 +254,18 @@
                             <form id="incomeForm">
                                 <div>
                                     <label for="date">Date:</label>
-                                    <input type="text" id="incomeDate" name="date" required>
+                                    <input autocomplete="off" type="text" id="incomeDate" name="date" required>
 
                                     <label for="amount">Amount:</label>
-                                    <input type="text" id="incomeAmount" name="amount" required>
+                                    <input autocomplete="off" type="text" id="incomeAmount" name="amount" required>
 
                                     <label for="memo">Memo:</label>
-                                    <input type="text" id="incomeMemo" name="memo">
+                                    <input autocomplete="off" type="text" id="incomeMemo" name="memo">
+                                    
+                                    <button type="submit" id="submitIncomeBtn">Submit</button>
+
                                 </div>
                                 
-                                <button type="submit" id="submitIncomeBtn">Submit</button>
-
                                 <!-- add styling-->
                                 <div id="incomeFeedbackMessage">
                                 </div>
@@ -324,7 +327,7 @@
                                         <button 
                                             class="trans-chat-btn" 
                                             transaction-name="{{ transaction[9] }}"
-                                            transaction-amount="{{ formatted_amount }}"
+                                            transaction-amount="${{ formatted_amount }}"
                                             transaction-date="{{ formatted_date }}"
                                             transaction-category="{{ transaction[2].title() }}"
                                             transaction-memo = "{{ transaction[4] }}">
@@ -387,7 +390,7 @@
                                         <button 
                                             class="income-chat-btn" 
                                             income-name="{{ income[8] }}"
-                                            income-amount="{{ formatted_amount }}"
+                                            income-amount="${{ formatted_amount }}"
                                             income-date="{{ formatted_date }}"
                                             income-memo = "{{ income[3] }}">
                                             >
@@ -407,7 +410,7 @@
                             <h2 class="group-chat-header">Group Chat</h2>
                             <div id="chatMessages"></div>
                             <form id="chatForm">
-                                <input type="text" id="chatInput" placeholder="Type your message here..." required>
+                                <input autocomplete="off" type="text" id="chatInput" placeholder="Type your message here..." required>
                                 <button type="submit">Send</button>
                             </form>
                         </section>

@@ -450,11 +450,11 @@ submitDateBtn.addEventListener("click", function() {
         }
     })
     .then(data => {
-        monthYearHeader = document.getElementById("monthYearHeader");
-        monthYearHeader.innerHTML = `${data.chosen_month} ${data.chosen_year}`
         fetchUpdatedIncome()
         fetchUpdatedTransactions()
         updateStats()
+        monthYearHeader = document.getElementById("monthYearHeader");
+        monthYearHeader.innerHTML = `${data.chosen_month} ${data.chosen_year}`
     })
 });
 

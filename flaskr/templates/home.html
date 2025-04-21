@@ -146,13 +146,13 @@
                 <form id="transForm">
                     <div id="inputContainer">
                         <label for="date">Date:</label>
-                        <input type="text" id="transDate" name="date" required>
+                        <input autocomplete="off" type="text" id="transDate" name="date" required>
 
                         <label for="amount">Amount:</label>
-                        <input type="text" id="transAmount" name="amount" required>
+                        <input autocomplete="off" type="text" id="transAmount" name="amount" required>
 
                         <label for="memo">Memo:</label>
-                        <input type="text" id="transMemo" name="memo">
+                        <input autocomplete="off" type="text" id="transMemo" name="memo">
                     </div>
 
                     <div id="categoryContainer">
@@ -168,10 +168,10 @@
                         
                         <div id="categoryInput" style="display: none;">
                             <label for="add-category">New Category:</label>
-                            <input type="text" id="add-category" name="add-category" placeholder="Type in your category">
+                            <input autocomplete="off" type="text" id="add-category" name="add-category" placeholder="Type in your category">
                         </div>
 
-                        <input type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
+                        <input autocomplete="off" type="hidden" id="hidden-category" name="hidden-category"> <!-- holds the category value -->
 
                         <button type="button" id="toggleCategoryBtn">Add Category</button>
                     
@@ -193,13 +193,13 @@
                     <form id="incomeForm">
                         <div>
                             <label for="date">Date:</label>
-                            <input type="text" id="incomeDate" name="date" required>
+                            <input autocomplete="off" type="text" id="incomeDate" name="date" required>
 
                             <label for="amount">Amount:</label>
-                            <input type="text" id="incomeAmount" name="amount" required>
+                            <input autocomplete="off" type="text" id="incomeAmount" name="amount" required>
 
                             <label for="memo">Memo:</label>
-                            <input type="text" id="incomeMemo" name="memo">
+                            <input autocomplete="off" type="text" id="incomeMemo" name="memo">
 
                             <button type="submit" id="submitIncomeBtn">Submit</button>
                         </div>

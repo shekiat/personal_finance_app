@@ -426,6 +426,8 @@ submitTransBtn.addEventListener("click", function() {
     .then(response => response.json())
         .then(data => {
             if (data.success) {
+                updateStats();
+                fetchUpdatedTransactions();
                 console.log("transaction added succesfully")
                 document.getElementById("transactionFeedbackMessage").innerText = "Transaction added!";
                 document.getElementById("transAmount").value = "",
@@ -439,9 +441,6 @@ submitTransBtn.addEventListener("click", function() {
                     input.style.display = "none";
                     button.textContent = "Add Category";
                 }
-
-                updateStats();
-                fetchUpdatedTransactions();
             }
             else {
                 //assign each form input to the value of data.amount, data.date, etc.
@@ -577,15 +576,14 @@ submitIncomeBtn.addEventListener("click", function() {
         .then(data => {
             console.log(data);
             if (data.success) {
+                updateStats();
+                fetchUpdatedIncome();
                 console.log("income added succesfully")
                 document.getElementById("incomeFeedbackMessage").innerText = "Income added!";
                 document.getElementById("incomeAmount").value = "",
                 document.getElementById("incomeDate").value = "",
                 document.getElementById("incomeMemo").value = ""
                 // hide category inpiut, display dropdown
-
-                updateStats();
-                fetchUpdatedIncome();
             }
             else {
                 //assign each form input to the value of data.amount, data.date, etc.
