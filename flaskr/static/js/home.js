@@ -51,6 +51,7 @@ document.addEventListener("click", function (e) {
     }
 
     document.getElementById("transactionFeedbackMessage").innerText = "";
+    document.getElementById("incomeFeedbackMessage").innerText = "";
     
     console.log(categorySelect.value)
     console.log(categoryInput.value)
@@ -225,9 +226,9 @@ submitTransBtn.addEventListener("click", function() {
 // update transaction table
 function updateTransactionTable(transactions) {
     console.log("updating transactions");
-    const tableBody = document.querySelector("#transactionTable table");
+    const tableBody = document.querySelector("#transactionTable table tbody");
 
-    tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
+    tableBody.querySelectorAll("tr").forEach(row => row.remove());
 
     transactions.forEach(transaction => {
         const formattedDate = formatDate(transaction[3]);
@@ -262,9 +263,8 @@ function formatDate(date) {
 }
 function formatAmount(amount) {
     const strAmount = amount.toString();
-    return strAmount.includes(".") && strAmount.split(".")[1].length === 1
-        ? `$${strAmount}0`
-        : `$${strAmount}`;
+    const formattedAmount = parseFloat(strAmount).toFixed(2);
+    return `$${formattedAmount}`
 }
 
 function fetchUpdatedTransactions() {
@@ -358,9 +358,9 @@ submitIncomeBtn.addEventListener("click", function() {
 // update transaction table
 function updateIncomeTable(income) {
     console.log("updating income");
-    const tableBody = document.querySelector("#incomeTable table");
+    const tableBody = document.querySelector("#incomeTable table tbody");
 
-    tableBody.querySelectorAll("tr:not(:first-child)").forEach(row => row.remove());
+    tableBody.querySelectorAll("tr").forEach(row => row.remove());
 
     income.forEach(income => {
         const formattedDate = formatDate(income[2]);
@@ -448,6 +448,8 @@ submitDateBtn.addEventListener("click", function() {
         }
     })
     .then(data => {
+        monthYearHeader = document.getElementById("monthYearHeader");
+        monthYearHeader.innerHTML = `${data.chosen_month} ${data.chosen_year}`
         updateStats()
         fetchUpdatedTransactions()
     })
@@ -496,6 +498,6 @@ function updateStatBox(selector, value, diff, diffPerc) {
             ? `${diff}0` : diff;
         box.querySelector("p:nth-of-type(2)").innerHTML = `${formattedDiff} (${diffPerc}%)`;
     } else {
-        box.querySelector("p:nth-of-type(2)").innerHTML = "-";
+        box.querySelector("p:nth-of-type(2)").innerHTML = `-`;
     }
 }
